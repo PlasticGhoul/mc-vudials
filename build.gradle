@@ -16,6 +16,9 @@ base {
 java.toolchain.languageVersion = JavaLanguageVersion.of(17)
 
 println "Java: ${System.getProperty 'java.version'}, JVM: ${System.getProperty 'java.vm.version'} (${System.getProperty 'java.vendor'}), Arch: ${System.getProperty 'os.arch'}"
+
+jarJar.fromRuntimeConfiguration()
+
 minecraft {
     // The mappings can be changed at any time and must be in the following format.
     // Channel:   Version:
@@ -144,6 +147,19 @@ dependencies {
     // For more info:
     // http://www.gradle.org/docs/current/userguide/artifact_dependencies_tutorial.html
     // http://www.gradle.org/docs/current/userguide/dependency_management.html
+
+    implementation(group: 'org.json', name: 'json', version: '[20240303,)')
+    implementation group: 'org.apache.httpcomponents', name: 'httpmime', version: '[4.5.14,)'
+ 
+}
+
+jarJar {
+    // Include or exclude dependencies here from runtime configuration
+    dependencies {
+        // Exclude any dependency which begins with 'com.google.gson.'
+        include(dependency('org.json:json'))
+        include(dependency('org.apache.httpcomponents:httpmime'))
+    }
 }
 
 // This block of code expands all declared replace properties in the specified resource targets.
@@ -164,6 +180,7 @@ tasks.named('processResources', ProcessResources).configure {
         expand replaceProperties + [project: project]
     }
 }
+
 
 // Example for how to get properties into the manifest for reading at runtime.
 tasks.named('jar', Jar).configure {
