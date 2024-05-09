@@ -149,7 +149,6 @@ dependencies {
     // http://www.gradle.org/docs/current/userguide/dependency_management.html
 
     implementation(group: 'org.json', name: 'json', version: '[20240303,)')
-    implementation group: 'org.apache.httpcomponents', name: 'httpmime', version: '[4.5.14,)'
  
 }
 
@@ -158,7 +157,6 @@ jarJar {
     dependencies {
         // Exclude any dependency which begins with 'com.google.gson.'
         include(dependency('org.json:json'))
-        include(dependency('org.apache.httpcomponents:httpmime'))
     }
 }
 
