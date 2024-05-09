@@ -95,8 +95,12 @@ public class MCVUDials {
 
                 // Armor
                 if (MCVUDialsHelper.dialUids.length >= 3) {
-                    LOGGER.info("ArmorCoverage: " + event.getEntity().getArmorCoverPercentage());
-                    LOGGER.info("ArmorValue: " + event.getEntity().getArmorValue());
+                    MCVUDialsHelper.setCurrentArmorValuePercent(event.getEntity().getArmorValue(), 20);
+                    MCVUDialsHelper.setCurrentArmorColors();
+                    
+                    MCVUDialsControl.setDialValue(MCVUDialsHelper.dialUids[2], MCVUDialsHelper.getCurrentArmorValuePercent());
+                    MCVUDialsControl.setDialColor(MCVUDialsHelper.dialUids[2], MCVUDialsHelper.getCurrentArmorColors().get("red"), MCVUDialsHelper.getCurrentArmorColors().get("green"), MCVUDialsHelper.getCurrentArmorColors().get("blue"));
+                    MCVUDialsControl.setDialImage(MCVUDialsHelper.dialUids[2], "armor.png");
                 }
 
                 // Air
@@ -209,6 +213,17 @@ public class MCVUDials {
             if (! MCVUDialsHelper.getCurrentFoodLevelColors().equals(MCVUDialsHelper.getNewFoodLevelColors(MCVUDialsHelper.getCurrentFoodLevelValuePercent()))) {
                 MCVUDialsHelper.setCurrentFoodLevelColors();
                 MCVUDialsControl.setDialColor(MCVUDialsHelper.dialUids[1], MCVUDialsHelper.getCurrentFoodLevelColors().get("red"), MCVUDialsHelper.getCurrentFoodLevelColors().get("green"), MCVUDialsHelper.getCurrentFoodLevelColors().get("blue"));
+            }
+        }
+
+        if (MCVUDialsHelper.getCurrentArmorValuePercent() != Math.round((event.player.getArmorValue()*100)/20)) {
+            MCVUDialsHelper.setCurrentArmorValuePercent(event.player.getArmorValue(), 20);
+            LOGGER.debug("Setting armor dial to " + MCVUDialsHelper.getCurrentArmorValuePercent());
+            MCVUDialsControl.setDialValue(MCVUDialsHelper.dialUids[2], MCVUDialsHelper.getCurrentArmorValuePercent());
+
+            if (! MCVUDialsHelper.getCurrentArmorColors().equals(MCVUDialsHelper.getNewArmorColors(MCVUDialsHelper.getCurrentArmorValuePercent()))) {
+                MCVUDialsHelper.setCurrentArmorColors();
+                MCVUDialsControl.setDialColor(MCVUDialsHelper.dialUids[2], MCVUDialsHelper.getCurrentArmorColors().get("red"), MCVUDialsHelper.getCurrentArmorColors().get("green"), MCVUDialsHelper.getCurrentArmorColors().get("blue"));
             }
         }
 
