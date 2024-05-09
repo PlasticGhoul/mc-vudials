@@ -75,44 +75,21 @@ public class MCVUDials {
 
                 // Health
                 if (MCVUDialsHelper.dialUids.length >= 1) {
-                    float playerMaxHealth = event.getEntity().getMaxHealth();
-                    float playerCurrentHealth = event.getEntity().getHealth();
-                    float playerCurrentHealthPercent = (playerCurrentHealth * 100) / playerMaxHealth;
+                    MCVUDialsHelper.setCurrentHealthValuePercent(event.getEntity().getHealth(), event.getEntity().getMaxHealth());
+                    MCVUDialsHelper.setCurrentHealthColors();
 
-                    MCVUDialsControl.setDialValue(MCVUDialsHelper.dialUids[0],
-                            String.valueOf(playerCurrentHealthPercent));
-                    if (playerCurrentHealthPercent > 50) {
-                        LOGGER.debug("Setting health dial color to green");
-                        MCVUDialsControl.setDialColor(MCVUDialsHelper.dialUids[0], 0, 100, 0);
-                    } else if (playerCurrentHealthPercent > 25) {
-                        LOGGER.debug("Setting health dial color to yellow");
-                        MCVUDialsControl.setDialColor(MCVUDialsHelper.dialUids[0], 100, 100, 0);
-                    } else if (playerCurrentHealthPercent <= 25) {
-                        LOGGER.debug("Setting health dial color to red");
-                        MCVUDialsControl.setDialColor(MCVUDialsHelper.dialUids[0], 100, 0, 0);
-                    }
+                    MCVUDialsControl.setDialValue(MCVUDialsHelper.dialUids[0], MCVUDialsHelper.getCurrentHealthValuePercent());
+                    MCVUDialsControl.setDialColor(MCVUDialsHelper.dialUids[0], MCVUDialsHelper.getCurrentHealthColors().get("red"), MCVUDialsHelper.getCurrentHealthColors().get("green"), MCVUDialsHelper.getCurrentHealthColors().get("blue"));
                     MCVUDialsControl.setDialImage(MCVUDialsHelper.dialUids[0], "health.png");
                 }
 
                 // Food
                 if (MCVUDialsHelper.dialUids.length >= 2) {
-                    MCVUDialsHelper.setFoodLevel(event.getEntity().getFoodData().getFoodLevel());
-                    int foodLevel = MCVUDialsHelper.getCurrentFoodLevel();
-                    int maxFoodLevel = 20;
-                    int foodLevelPercent = (foodLevel * 100) / maxFoodLevel;
-
-                    MCVUDialsControl.setDialValue(MCVUDialsHelper.dialUids[1],
-                            String.valueOf(foodLevelPercent));
-                    if (foodLevelPercent > 50) {
-                        LOGGER.debug("Setting food dial color to green");
-                        MCVUDialsControl.setDialColor(MCVUDialsHelper.dialUids[1], 0, 100, 0);
-                    } else if (foodLevelPercent > 25) {
-                        LOGGER.debug("Setting food dial color to yellow");
-                        MCVUDialsControl.setDialColor(MCVUDialsHelper.dialUids[1], 100, 100, 0);
-                    } else if (foodLevelPercent <= 25) {
-                        LOGGER.debug("Setting food dial color to red");
-                        MCVUDialsControl.setDialColor(MCVUDialsHelper.dialUids[1], 100, 0, 0);
-                    }
+                    MCVUDialsHelper.setCurrentFoodLevelValuePercent(event.getEntity().getFoodData().getFoodLevel(), 20);
+                    MCVUDialsHelper.setCurrentFoodLevelColors();
+                    
+                    MCVUDialsControl.setDialValue(MCVUDialsHelper.dialUids[1], MCVUDialsHelper.getCurrentFoodLevelValuePercent());
+                    MCVUDialsControl.setDialColor(MCVUDialsHelper.dialUids[1], MCVUDialsHelper.getCurrentFoodLevelColors().get("red"), MCVUDialsHelper.getCurrentFoodLevelColors().get("green"), MCVUDialsHelper.getCurrentFoodLevelColors().get("blue"));
                     MCVUDialsControl.setDialImage(MCVUDialsHelper.dialUids[1], "food.png");
                 }
             }
@@ -125,13 +102,13 @@ public class MCVUDials {
             LOGGER.info("Resetting dial values...");
 
             if (MCVUDialsHelper.dialUids.length >= 1) {
-                MCVUDialsControl.setDialValue(MCVUDialsHelper.dialUids[0], "0");
+                MCVUDialsControl.setDialValue(MCVUDialsHelper.dialUids[0], 0);
                 MCVUDialsControl.setDialColor(MCVUDialsHelper.dialUids[0], 0, 0, 0);
                 MCVUDialsControl.setDialImage(MCVUDialsHelper.dialUids[0], "blank.png");
             }
 
             if (MCVUDialsHelper.dialUids.length >= 2) {
-                MCVUDialsControl.setDialValue(MCVUDialsHelper.dialUids[1], "0");
+                MCVUDialsControl.setDialValue(MCVUDialsHelper.dialUids[1], 0);
                 MCVUDialsControl.setDialColor(MCVUDialsHelper.dialUids[1], 0, 0, 0);
                 MCVUDialsControl.setDialImage(MCVUDialsHelper.dialUids[1], "blank.png");
             }
@@ -146,24 +123,17 @@ public class MCVUDials {
                     && event.getEntity().getName().equals(Minecraft.getInstance().player.getName())
                     && MCVUDialsHelper.dialUids.length >= 1) {
                 float entityMaxHealth = event.getEntity().self().getMaxHealth();
-                float entityCurrentHealth = event.getEntity().self().getHealth();
-                float entityDamageAmount = event.getAmount();
-                int entityCurrentHealthPercent = Math
-                        .round(((entityCurrentHealth - entityDamageAmount) * 100) / entityMaxHealth);
+                float entityCurrentHealth = event.getEntity().self().getHealth() - event.getAmount();
+                
+                if (MCVUDialsHelper.getCurrentHealthValuePercent() != Math.round((entityCurrentHealth * 100)/entityMaxHealth)) {
+                    MCVUDialsHelper.setCurrentHealthValuePercent(entityCurrentHealth, entityMaxHealth);
+                    LOGGER.debug("Setting health dial to " + MCVUDialsHelper.getCurrentHealthValuePercent());
+                    MCVUDialsControl.setDialValue(MCVUDialsHelper.dialUids[0], MCVUDialsHelper.getCurrentHealthValuePercent());
 
-                LOGGER.debug("Setting health dial to " + entityCurrentHealthPercent);
-                MCVUDialsControl.setDialValue(MCVUDialsHelper.dialUids[0],
-                        String.valueOf(entityCurrentHealthPercent));
-
-                if (entityCurrentHealthPercent > 50) {
-                    LOGGER.debug("Setting health dial color to green");
-                    MCVUDialsControl.setDialColor(MCVUDialsHelper.dialUids[0], 0, 100, 0);
-                } else if (entityCurrentHealthPercent > 25) {
-                    LOGGER.debug("Setting health dial color to yellow");
-                    MCVUDialsControl.setDialColor(MCVUDialsHelper.dialUids[0], 100, 100, 0);
-                } else if (entityCurrentHealthPercent <= 25) {
-                    LOGGER.debug("Setting health dial color to red");
-                    MCVUDialsControl.setDialColor(MCVUDialsHelper.dialUids[0], 100, 0, 0);
+                    if (! MCVUDialsHelper.getCurrentHealthColors().equals(MCVUDialsHelper.getNewHealthColors(MCVUDialsHelper.getCurrentHealthValuePercent()))) {
+                        MCVUDialsHelper.setCurrentHealthColors();
+                        MCVUDialsControl.setDialColor(MCVUDialsHelper.dialUids[0], MCVUDialsHelper.getCurrentHealthColors().get("red"), MCVUDialsHelper.getCurrentHealthColors().get("green"), MCVUDialsHelper.getCurrentHealthColors().get("blue"));
+                    }
                 }
             }
         } catch (NullPointerException exception) {
@@ -181,26 +151,18 @@ public class MCVUDials {
                     && event.getEntity().getName().equals(Minecraft.getInstance().player.getName())
                     && MCVUDialsHelper.dialUids.length >= 1) {
                 float entityMaxHealth = event.getEntity().self().getMaxHealth();
-                float entityCurrentHealth = event.getEntity().self().getHealth();
-                float entityHealAmount = event.getAmount();
-                int entityCurrentHealthPercent = Math
-                        .round(((entityCurrentHealth + entityHealAmount) * 100) / entityMaxHealth);
+                float entityCurrentHealth = event.getEntity().self().getHealth() + event.getAmount();
+                
+                if (MCVUDialsHelper.getCurrentHealthValuePercent() != Math.round((entityCurrentHealth * 100)/entityMaxHealth)) {
+                    MCVUDialsHelper.setCurrentHealthValuePercent(entityCurrentHealth, entityMaxHealth);
+                    LOGGER.debug("Setting health dial to " + MCVUDialsHelper.getCurrentHealthValuePercent());
+                    MCVUDialsControl.setDialValue(MCVUDialsHelper.dialUids[0], MCVUDialsHelper.getCurrentHealthValuePercent());
 
-                LOGGER.debug("Setting health dial to " + entityCurrentHealthPercent);
-                MCVUDialsControl.setDialValue(MCVUDialsHelper.dialUids[0],
-                        String.valueOf(entityCurrentHealthPercent));
-
-                if (entityCurrentHealthPercent > 50) {
-                    LOGGER.debug("Setting health dial color to green");
-                    MCVUDialsControl.setDialColor(MCVUDialsHelper.dialUids[0], 0, 100, 0);
-                } else if (entityCurrentHealthPercent > 25) {
-                    LOGGER.debug("Setting health dial color to yellow");
-                    MCVUDialsControl.setDialColor(MCVUDialsHelper.dialUids[0], 100, 100, 0);
-                } else if (entityCurrentHealthPercent <= 25) {
-                    LOGGER.debug("Setting health dial color to red");
-                    MCVUDialsControl.setDialColor(MCVUDialsHelper.dialUids[0], 100, 0, 0);
+                    if (! MCVUDialsHelper.getCurrentHealthColors().equals(MCVUDialsHelper.getNewHealthColors(MCVUDialsHelper.getCurrentHealthValuePercent()))) {
+                        MCVUDialsHelper.setCurrentHealthColors();
+                        MCVUDialsControl.setDialColor(MCVUDialsHelper.dialUids[0], MCVUDialsHelper.getCurrentHealthColors().get("red"), MCVUDialsHelper.getCurrentHealthColors().get("green"), MCVUDialsHelper.getCurrentHealthColors().get("blue"));
+                    }
                 }
-
             }
         } catch (NullPointerException exception) {
             LOGGER.error("Error getting player entity!");
@@ -211,27 +173,15 @@ public class MCVUDials {
 
     @SubscribeEvent
     public void onServerTick(PlayerTickEvent event) {
-        int newFoodLevel = event.player.getFoodData().getFoodLevel();
-
-        if (newFoodLevel != MCVUDialsHelper.getCurrentFoodLevel()) {
-            MCVUDialsHelper.setFoodLevel(newFoodLevel);
+        if (MCVUDialsHelper.getCurrentFoodLevelValuePercent() != Math.round((event.player.getFoodData().getFoodLevel()*100)/20)) {
+            MCVUDialsHelper.setCurrentFoodLevelValuePercent(event.player.getFoodData().getFoodLevel(), 20);
+            LOGGER.debug("Setting food dial to " + MCVUDialsHelper.getCurrentFoodLevelValuePercent());
+            MCVUDialsControl.setDialValue(MCVUDialsHelper.dialUids[1], MCVUDialsHelper.getCurrentFoodLevelValuePercent());
             
-            int maxFoodLevel = 20;
-            int foodLevelPercent = (MCVUDialsHelper.getCurrentFoodLevel() * 100) / maxFoodLevel;
-
-            MCVUDialsControl.setDialValue(MCVUDialsHelper.dialUids[1],
-                    String.valueOf(foodLevelPercent));
-            if (foodLevelPercent > 50) {
-                LOGGER.debug("Setting food dial color to green");
-                MCVUDialsControl.setDialColor(MCVUDialsHelper.dialUids[1], 0, 100, 0);
-            } else if (foodLevelPercent > 25) {
-                LOGGER.debug("Setting food dial color to yellow");
-                MCVUDialsControl.setDialColor(MCVUDialsHelper.dialUids[1], 100, 100, 0);
-            } else if (foodLevelPercent <= 25) {
-                LOGGER.debug("Setting food dial color to red");
-                MCVUDialsControl.setDialColor(MCVUDialsHelper.dialUids[1], 100, 0, 0);
+            if (! MCVUDialsHelper.getCurrentFoodLevelColors().equals(MCVUDialsHelper.getNewFoodLevelColors(MCVUDialsHelper.getCurrentFoodLevelValuePercent()))) {
+                MCVUDialsHelper.setCurrentFoodLevelColors();
+                MCVUDialsControl.setDialColor(MCVUDialsHelper.dialUids[1], MCVUDialsHelper.getCurrentFoodLevelColors().get("red"), MCVUDialsHelper.getCurrentFoodLevelColors().get("green"), MCVUDialsHelper.getCurrentFoodLevelColors().get("blue"));
             }
-
         }
     }
 }

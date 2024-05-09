@@ -23,7 +23,7 @@ public class MCVUDialsControl {
     public MCVUDialsControl() {
     }
 
-    public static void setDialValue(String dialUid, String dialValue) {
+    public static void setDialValue(String dialUid, int dialValue) {
         HttpURLConnection connection = null;
 
         try {
