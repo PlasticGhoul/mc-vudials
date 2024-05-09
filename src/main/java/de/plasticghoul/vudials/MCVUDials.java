@@ -92,6 +92,22 @@ public class MCVUDials {
                     MCVUDialsControl.setDialColor(MCVUDialsHelper.dialUids[1], MCVUDialsHelper.getCurrentFoodLevelColors().get("red"), MCVUDialsHelper.getCurrentFoodLevelColors().get("green"), MCVUDialsHelper.getCurrentFoodLevelColors().get("blue"));
                     MCVUDialsControl.setDialImage(MCVUDialsHelper.dialUids[1], "food.png");
                 }
+
+                // Armor
+                if (MCVUDialsHelper.dialUids.length >= 3) {
+                    LOGGER.info("ArmorCoverage: " + event.getEntity().getArmorCoverPercentage());
+                    LOGGER.info("ArmorValue: " + event.getEntity().getArmorValue());
+                }
+
+                // Air
+                if (MCVUDialsHelper.dialUids.length >= 4) {
+                    MCVUDialsHelper.setCurrentAirValuePercent(event.getEntity().getAirSupply(), event.getEntity().getMaxAirSupply());
+                    MCVUDialsHelper.setCurrentAirColors();
+                    
+                    MCVUDialsControl.setDialValue(MCVUDialsHelper.dialUids[3], MCVUDialsHelper.getCurrentAirValuePercent());
+                    MCVUDialsControl.setDialColor(MCVUDialsHelper.dialUids[3], MCVUDialsHelper.getCurrentAirColors().get("red"), MCVUDialsHelper.getCurrentAirColors().get("green"), MCVUDialsHelper.getCurrentAirColors().get("blue"));
+                    MCVUDialsControl.setDialImage(MCVUDialsHelper.dialUids[3], "air.png");
+                }
             }
         }
     }
@@ -111,6 +127,18 @@ public class MCVUDials {
                 MCVUDialsControl.setDialValue(MCVUDialsHelper.dialUids[1], 0);
                 MCVUDialsControl.setDialColor(MCVUDialsHelper.dialUids[1], 0, 0, 0);
                 MCVUDialsControl.setDialImage(MCVUDialsHelper.dialUids[1], "blank.png");
+            }
+
+            if (MCVUDialsHelper.dialUids.length >= 3) {
+                MCVUDialsControl.setDialValue(MCVUDialsHelper.dialUids[2], 0);
+                MCVUDialsControl.setDialColor(MCVUDialsHelper.dialUids[2], 0, 0, 0);
+                MCVUDialsControl.setDialImage(MCVUDialsHelper.dialUids[2], "blank.png");
+            }
+
+            if (MCVUDialsHelper.dialUids.length >= 4) {
+                MCVUDialsControl.setDialValue(MCVUDialsHelper.dialUids[3], 0);
+                MCVUDialsControl.setDialColor(MCVUDialsHelper.dialUids[3], 0, 0, 0);
+                MCVUDialsControl.setDialImage(MCVUDialsHelper.dialUids[3], "blank.png");
             }
         }
     }
@@ -181,6 +209,17 @@ public class MCVUDials {
             if (! MCVUDialsHelper.getCurrentFoodLevelColors().equals(MCVUDialsHelper.getNewFoodLevelColors(MCVUDialsHelper.getCurrentFoodLevelValuePercent()))) {
                 MCVUDialsHelper.setCurrentFoodLevelColors();
                 MCVUDialsControl.setDialColor(MCVUDialsHelper.dialUids[1], MCVUDialsHelper.getCurrentFoodLevelColors().get("red"), MCVUDialsHelper.getCurrentFoodLevelColors().get("green"), MCVUDialsHelper.getCurrentFoodLevelColors().get("blue"));
+            }
+        }
+
+        if (MCVUDialsHelper.getCurrentAirValuePercent() != Math.round((event.player.getAirSupply()*100)/event.player.getMaxAirSupply()) && Math.round((event.player.getAirSupply()*100)/event.player.getMaxAirSupply()) % 5 == 0 ) {
+            MCVUDialsHelper.setCurrentAirValuePercent(event.player.getAirSupply(), event.player.getMaxAirSupply());
+            LOGGER.debug("Setting air dial to " + MCVUDialsHelper.getCurrentAirValuePercent());
+            MCVUDialsControl.setDialValue(MCVUDialsHelper.dialUids[3], MCVUDialsHelper.getCurrentAirValuePercent());
+            
+            if (! MCVUDialsHelper.getCurrentAirColors().equals(MCVUDialsHelper.getNewAirColors(MCVUDialsHelper.getCurrentAirValuePercent()))) {
+                MCVUDialsHelper.setCurrentAirColors();
+                MCVUDialsControl.setDialColor(MCVUDialsHelper.dialUids[3], MCVUDialsHelper.getCurrentAirColors().get("red"), MCVUDialsHelper.getCurrentAirColors().get("green"), MCVUDialsHelper.getCurrentAirColors().get("blue"));
             }
         }
     }

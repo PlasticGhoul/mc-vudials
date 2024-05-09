@@ -147,6 +147,26 @@ public class MCVUDialsHelper {
         currentFoodLevelValuePercent = Math.round((newFoodLevel * 100) / maxFoodLevel);
     }
 
+    public static int getCurrentArmorValuePercent() {
+        return currentArmorValuePercent;
+    }
+
+    public static void setCurrentArmorValuePercent(int newArmor, int maxArmor) {
+
+        currentArmorValuePercent = Math.round((newArmor * 100) / maxArmor);
+    }
+
+    public static int getCurrentAirValuePercent() {
+        return currentAirValuePercent;
+    }
+
+    public static void setCurrentAirValuePercent(int newAir, int maxAir) {
+        if (newAir < 0) {
+            newAir = 0;
+        }
+        currentAirValuePercent = Math.round((newAir * 100) / maxAir);
+    }
+
     // Dial Colors
     public static HashMap<String, Integer> getCurrentHealthColors() {
         return currentHealthColors;
@@ -199,44 +219,136 @@ public class MCVUDialsHelper {
     }
 
     public static HashMap<String, Integer> getNewFoodLevelColors(int newFoodLevel) {
-        HashMap<String, Integer> newHFoodLevelColors = new HashMap<String, Integer>();
+        HashMap<String, Integer> newFoodLevelColors = new HashMap<String, Integer>();
 
         if (newFoodLevel > 50) {
-            newHFoodLevelColors.put("red", 0);
-            newHFoodLevelColors.put("green", 100);
-            newHFoodLevelColors.put("blue", 0);
+            newFoodLevelColors.put("red", 0);
+            newFoodLevelColors.put("green", 100);
+            newFoodLevelColors.put("blue", 0);
         } else if (newFoodLevel > 30) {
-            newHFoodLevelColors.put("red", 100);
-            newHFoodLevelColors.put("green", 100);
-            newHFoodLevelColors.put("blue", 0);
+            newFoodLevelColors.put("red", 100);
+            newFoodLevelColors.put("green", 100);
+            newFoodLevelColors.put("blue", 0);
         } else if (newFoodLevel <= 30) {
-            newHFoodLevelColors.put("red", 100);
-            newHFoodLevelColors.put("green", 0);
-            newHFoodLevelColors.put("blue", 0);
+            newFoodLevelColors.put("red", 100);
+            newFoodLevelColors.put("green", 0);
+            newFoodLevelColors.put("blue", 0);
         }
 
-        return newHFoodLevelColors;
+        return newFoodLevelColors;
     }
 
     public static void setCurrentFoodLevelColors() {
         if (getCurrentFoodLevelValuePercent() > 50) {
-            LOGGER.debug("Setting health dial color to green");
+            LOGGER.debug("Setting food dial color to green");
 
             currentFoodLevelColors.put("red", 0);
             currentFoodLevelColors.put("green", 100);
             currentFoodLevelColors.put("blue", 0);
         } else if (getCurrentFoodLevelValuePercent() > 30) {
-            LOGGER.debug("Setting health dial color to yellow");
+            LOGGER.debug("Setting food dial color to yellow");
 
             currentFoodLevelColors.put("red", 100);
             currentFoodLevelColors.put("green", 100);
             currentFoodLevelColors.put("blue", 0);
         } else if (getCurrentFoodLevelValuePercent() <= 30) {
-            LOGGER.debug("Setting health dial color to red");
+            LOGGER.debug("Setting food dial color to red");
 
             currentFoodLevelColors.put("red", 100);
             currentFoodLevelColors.put("green", 0);
             currentFoodLevelColors.put("blue", 0);
+        }        
+    }
+
+    public static HashMap<String, Integer> getCurrentArmorColors() {
+        return currentArmorColors;
+    }
+
+    public static HashMap<String, Integer> getNewArmorColors(int newArmor) {
+        HashMap<String, Integer> newArmorColors = new HashMap<String, Integer>();
+
+        if (newArmor > 50) {
+            newArmorColors.put("red", 0);
+            newArmorColors.put("green", 100);
+            newArmorColors.put("blue", 0);
+        } else if (newArmor > 30) {
+            newArmorColors.put("red", 100);
+            newArmorColors.put("green", 100);
+            newArmorColors.put("blue", 0);
+        } else if (newArmor <= 30) {
+            newArmorColors.put("red", 100);
+            newArmorColors.put("green", 0);
+            newArmorColors.put("blue", 0);
+        }
+
+        return newArmorColors;
+    }
+
+    public static void setCurrentArmorColors() {
+        if (getCurrentArmorValuePercent() > 50) {
+            LOGGER.debug("Setting armor dial color to green");
+
+            currentArmorColors.put("red", 0);
+            currentArmorColors.put("green", 100);
+            currentArmorColors.put("blue", 0);
+        } else if (getCurrentArmorValuePercent() > 30) {
+            LOGGER.debug("Setting armor dial color to yellow");
+
+            currentArmorColors.put("red", 100);
+            currentArmorColors.put("green", 100);
+            currentArmorColors.put("blue", 0);
+        } else if (getCurrentArmorValuePercent() <= 30) {
+            LOGGER.debug("Setting armor dial color to red");
+
+            currentArmorColors.put("red", 100);
+            currentArmorColors.put("green", 0);
+            currentArmorColors.put("blue", 0);
+        }        
+    }
+
+    public static HashMap<String, Integer> getCurrentAirColors() {
+        return currentAirColors;
+    }
+
+    public static HashMap<String, Integer> getNewAirColors(int newAir) {
+        HashMap<String, Integer> newAirColors = new HashMap<String, Integer>();
+
+        if (newAir > 50) {
+            newAirColors.put("red", 0);
+            newAirColors.put("green", 100);
+            newAirColors.put("blue", 0);
+        } else if (newAir > 30) {
+            newAirColors.put("red", 100);
+            newAirColors.put("green", 100);
+            newAirColors.put("blue", 0);
+        } else if (newAir <= 30) {
+            newAirColors.put("red", 100);
+            newAirColors.put("green", 0);
+            newAirColors.put("blue", 0);
+        }
+
+        return newAirColors;
+    }
+
+    public static void setCurrentAirColors() {
+        if (getCurrentAirValuePercent() > 50) {
+            LOGGER.debug("Setting air dial color to green");
+
+            currentAirColors.put("red", 0);
+            currentAirColors.put("green", 100);
+            currentAirColors.put("blue", 0);
+        } else if (getCurrentAirValuePercent() > 30) {
+            LOGGER.debug("Setting air dial color to yellow");
+
+            currentAirColors.put("red", 100);
+            currentAirColors.put("green", 100);
+            currentAirColors.put("blue", 0);
+        } else if (getCurrentAirValuePercent() <= 30) {
+            LOGGER.debug("Setting air dial color to red");
+
+            currentAirColors.put("red", 100);
+            currentAirColors.put("green", 0);
+            currentAirColors.put("blue", 0);
         }        
     }
 
