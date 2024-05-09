@@ -1,27 +1,27 @@
 package de.plasticghoul.vudials;
 
 import com.mojang.logging.LogUtils;
-
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.ModLoadingContext;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.config.ModConfig;
-import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
-import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import net.minecraft.client.Minecraft;
+import org.slf4j.Logger;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.Writer;
+
+import net.minecraft.client.Minecraft;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.fml.ModLoadingContext;
+import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.config.ModConfig;
+import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.minecraftforge.eventbus.api.IEventBus;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.event.server.ServerStartingEvent;
 import net.minecraftforge.event.entity.living.LivingHealEvent;
-
 import net.minecraftforge.event.entity.player.PlayerEvent.PlayerLoggedInEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent.PlayerLoggedOutEvent;
-import org.slf4j.Logger;
+import net.minecraftforge.event.TickEvent.PlayerTickEvent;
 
 @Mod(MCVUDials.MODID)
 public class MCVUDials {
@@ -41,8 +41,8 @@ public class MCVUDials {
 
     private void commonSetup(final FMLCommonSetupEvent event) {
         LOGGER.info("Common Setup started...");
-    
-        if(MCVUDialsConfig.vuServerApiKey.isEmpty()) {
+
+        if (MCVUDialsConfig.vuServerApiKey.isEmpty()) {
             LOGGER.warn("The config parameter 'vuServerApiKey' is empty!");
             event.setCanceled(true);
         }
@@ -96,7 +96,8 @@ public class MCVUDials {
 
                 // Food
                 if (MCVUDialsHelper.dialUids.length >= 2) {
-                    int foodLevel = event.getEntity().getFoodData().getFoodLevel();
+                    MCVUDialsHelper.setFoodLevel(event.getEntity().getFoodData().getFoodLevel());
+                    int foodLevel = MCVUDialsHelper.getCurrentFoodLevel();
                     int maxFoodLevel = 20;
                     int foodLevelPercent = (foodLevel * 100) / maxFoodLevel;
 
@@ -205,6 +206,32 @@ public class MCVUDials {
             LOGGER.error("Error getting player entity!");
             exception.printStackTrace(printwriter);
             LOGGER.error(buffer.toString());
+        }
+    }
+
+    @SubscribeEvent
+    public void onServerTick(PlayerTickEvent event) {
+        int newFoodLevel = event.player.getFoodData().getFoodLevel();
+
+        if (newFoodLevel != MCVUDialsHelper.getCurrentFoodLevel()) {
+            MCVUDialsHelper.setFoodLevel(newFoodLevel);
+            
+            int maxFoodLevel = 20;
+            int foodLevelPercent = (MCVUDialsHelper.getCurrentFoodLevel() * 100) / maxFoodLevel;
+
+            MCVUDialsControl.setDialValue(MCVUDialsHelper.dialUids[1],
+                    String.valueOf(foodLevelPercent));
+            if (foodLevelPercent > 50) {
+                LOGGER.debug("Setting food dial color to green");
+                MCVUDialsControl.setDialColor(MCVUDialsHelper.dialUids[1], 0, 100, 0);
+            } else if (foodLevelPercent > 25) {
+                LOGGER.debug("Setting food dial color to yellow");
+                MCVUDialsControl.setDialColor(MCVUDialsHelper.dialUids[1], 100, 100, 0);
+            } else if (foodLevelPercent <= 25) {
+                LOGGER.debug("Setting food dial color to red");
+                MCVUDialsControl.setDialColor(MCVUDialsHelper.dialUids[1], 100, 0, 0);
+            }
+
         }
     }
 }

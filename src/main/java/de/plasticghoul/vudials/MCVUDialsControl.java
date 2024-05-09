@@ -1,19 +1,19 @@
 package de.plasticghoul.vudials;
 
+import org.slf4j.Logger;
+import com.mojang.logging.LogUtils;
+
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.io.BufferedReader;
+import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.io.OutputStreamWriter;
-import org.slf4j.Logger;
-import com.mojang.logging.LogUtils;
-
-import org.jline.utils.InputStreamReader;
 
 public class MCVUDialsControl {
     private static final Logger LOGGER = LogUtils.getLogger();
@@ -39,13 +39,13 @@ public class MCVUDialsControl {
             int responseCode = connection.getResponseCode();
             if (responseCode == HttpURLConnection.HTTP_OK || responseCode == HttpURLConnection.HTTP_CREATED) {
                 BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-			    String inputLine;
-			    StringBuffer response = new StringBuffer();
+                String inputLine;
+                StringBuffer response = new StringBuffer();
 
-			    while ((inputLine = in.readLine()) != null) {
-				    response.append(inputLine);
-			    }
-			    in.close();
+                while ((inputLine = in.readLine()) != null) {
+                    response.append(inputLine);
+                }
+                in.close();
 
                 LOGGER.debug("Response: " + response.toString());
             } else {
@@ -78,13 +78,13 @@ public class MCVUDialsControl {
             int responseCode = connection.getResponseCode();
             if (responseCode == HttpURLConnection.HTTP_OK || responseCode == HttpURLConnection.HTTP_CREATED) {
                 BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-			    String inputLine;
-			    StringBuffer response = new StringBuffer();
+                String inputLine;
+                StringBuffer response = new StringBuffer();
 
-			    while ((inputLine = in.readLine()) != null) {
-				    response.append(inputLine);
-			    }
-			    in.close();
+                while ((inputLine = in.readLine()) != null) {
+                    response.append(inputLine);
+                }
+                in.close();
 
                 LOGGER.debug("Response: " + response.toString());
             } else {
