@@ -1,0 +1,28 @@
+name: "[90] Check Pull-Request"
+
+on:
+  pull_request:
+    branches: ["main"]
+
+jobs:
+    build:
+        runs-on: ["ubuntu-latest"]
+        permissions:
+            contents: read
+        steps:
+        - name: "Prepare: Checkout"
+          uses: actions/checkout@v4
+
+        - name: "Prepare: Setup Java"
+          uses: actions/setup-java@v4
+          with:
+            distribution: "zulu"
+            java-version: "17"
+
+        - name: "Prepare: Setup Gradle"
+          uses: gradle/actions/setup-gradle@v3
+          with:
+            gradle-version: current
+
+        - name: "Check: Build new artifact"
+          run: gradle build

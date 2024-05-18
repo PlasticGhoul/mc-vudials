@@ -1,0 +1,51 @@
+name: "[00] Release"
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Version of the mod to release"
+        required: true
+
+jobs:
+  release:
+      runs-on: ["ubuntu-latest"]
+      permissions:
+        contents: write
+        packages: write
+      steps:
+        - name: "Prepare: Checkout"
+          uses: actions/checkout@v4
+
+        - name: "Prepare: Setup Java"
+          uses: actions/setup-java@v4
+          with:
+            distribution: "zulu"
+            java-version: "17"
+
+        - name: "Prepare: Setup Gradle"
+          uses: gradle/actions/setup-gradle@v3
+          with:
+            gradle-version: current
+
+        - name: "Release: Set new version"
+          run: sed -i "s/mod_version=.*/mod_version=${{ github.event.inputs.version }}/g" gradle.properties
+
+        - name: "Release: Build new artifact"
+          run: gradle build
+
+        - name: "Release: Publish artifacts"
+          run: gradle publish
+          env:
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+        - name: "Release: Push new version"
+          run: |
+            git config --local user.email "github-actions[bot]@users.noreply.github.com"
+            git config --local user.name "github-actions[bot]"
+
+            git commit -m "New Release: ${{ github.event.inputs.version }}"
+            git tag ${{ github.event.inputs.version }}
+
+            git push origin ${{ github.ref }}
+            git push --tags
