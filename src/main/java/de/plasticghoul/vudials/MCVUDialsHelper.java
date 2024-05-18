@@ -24,7 +24,7 @@ public class MCVUDialsHelper {
     private static PrintWriter printwriter = new PrintWriter(buffer);
     public static boolean serverAvailable = false;
     public static String[] dialUids = null;
-    
+
     // Dial Values
     public static int currentHealthValuePercent = 0;
     public static int currentFoodLevelValuePercent = 0;
@@ -135,7 +135,7 @@ public class MCVUDialsHelper {
     }
 
     public static void setCurrentHealthValuePercent(float newHealth, float maxHealth) {
-        currentHealthValuePercent = Math.round((newHealth * 100)/maxHealth);
+        currentHealthValuePercent = Math.round((newHealth * 100) / maxHealth);
     }
 
     public static int getCurrentFoodLevelValuePercent() {
@@ -211,7 +211,7 @@ public class MCVUDialsHelper {
             currentHealthColors.put("red", 100);
             currentHealthColors.put("green", 0);
             currentHealthColors.put("blue", 0);
-        }        
+        }
     }
 
     public static HashMap<String, Integer> getCurrentFoodLevelColors() {
@@ -257,7 +257,7 @@ public class MCVUDialsHelper {
             currentFoodLevelColors.put("red", 100);
             currentFoodLevelColors.put("green", 0);
             currentFoodLevelColors.put("blue", 0);
-        }        
+        }
     }
 
     public static HashMap<String, Integer> getCurrentArmorColors() {
@@ -303,7 +303,7 @@ public class MCVUDialsHelper {
             currentArmorColors.put("red", 100);
             currentArmorColors.put("green", 0);
             currentArmorColors.put("blue", 0);
-        }        
+        }
     }
 
     public static HashMap<String, Integer> getCurrentAirColors() {
@@ -349,7 +349,7 @@ public class MCVUDialsHelper {
             currentAirColors.put("red", 100);
             currentAirColors.put("green", 0);
             currentAirColors.put("blue", 0);
-        }        
+        }
     }
 
 }

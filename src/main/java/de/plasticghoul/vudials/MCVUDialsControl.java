@@ -107,33 +107,25 @@ public class MCVUDialsControl {
             String apiUrl = MCVUDialsConfig.vuServerApiBaseUrl + "/api/v0/dial/" + dialUid + "/image/set?key="
                     + MCVUDialsConfig.vuServerApiKey + "&imgfile=" + dialImage;
 
-            // Create a boundary for the multipart/form-data request
             String boundary = "===" + System.currentTimeMillis() + "===";
 
             URL url = new URL(apiUrl);
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
 
-            // Set the necessary headers
             connection.setRequestMethod("POST");
             connection.setRequestProperty("Content-Type", "multipart/form-data; boundary=" + boundary);
             connection.setDoOutput(true);
 
-            // Read the file from the classpath
             InputStream fileStream = MCVUDials.class.getResourceAsStream("/" + dialImage);
 
-            // Write the request body
             try (OutputStream outputStream = connection.getOutputStream();
                     PrintWriter writer = new PrintWriter(new OutputStreamWriter(outputStream, "UTF-8"), true)) {
-                // Write boundary
                 writer.append("--").append(boundary).append("\r\n");
-                // Write Content-Disposition header
                 writer.append("Content-Disposition: form-data; name=\"imgfile\"; filename=\"").append(dialImage)
                         .append("\"\r\n");
-                // Write Content-Type header
                 writer.append("Content-Type: ").append("multipart/form-data").append("\r\n");
                 writer.append("\r\n").flush();
 
-                // Write file content
                 byte[] buffer = new byte[4096];
                 int bytesRead;
                 while ((bytesRead = fileStream.read(buffer)) != -1) {
@@ -141,12 +133,10 @@ public class MCVUDialsControl {
                 }
                 outputStream.flush();
 
-                // Write boundary
                 writer.append("\r\n").flush();
                 writer.append("--").append(boundary).append("--\r\n").flush();
             }
 
-            // Read the response
             StringBuilder response = new StringBuilder();
             try (BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
                 String inputLine;
@@ -155,7 +145,6 @@ public class MCVUDialsControl {
                 }
             }
 
-            // Close the connection
             connection.disconnect();
         } catch (Exception exception) {
             exception.printStackTrace();

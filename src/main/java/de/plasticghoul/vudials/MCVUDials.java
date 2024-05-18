@@ -75,11 +75,16 @@ public class MCVUDials {
 
                 // Health
                 if (MCVUDialsHelper.dialUids.length >= 1) {
-                    MCVUDialsHelper.setCurrentHealthValuePercent(event.getEntity().getHealth(), event.getEntity().getMaxHealth());
+                    MCVUDialsHelper.setCurrentHealthValuePercent(event.getEntity().getHealth(),
+                            event.getEntity().getMaxHealth());
                     MCVUDialsHelper.setCurrentHealthColors();
 
-                    MCVUDialsControl.setDialValue(MCVUDialsHelper.dialUids[0], MCVUDialsHelper.getCurrentHealthValuePercent());
-                    MCVUDialsControl.setDialColor(MCVUDialsHelper.dialUids[0], MCVUDialsHelper.getCurrentHealthColors().get("red"), MCVUDialsHelper.getCurrentHealthColors().get("green"), MCVUDialsHelper.getCurrentHealthColors().get("blue"));
+                    MCVUDialsControl.setDialValue(MCVUDialsHelper.dialUids[0],
+                            MCVUDialsHelper.getCurrentHealthValuePercent());
+                    MCVUDialsControl.setDialColor(MCVUDialsHelper.dialUids[0],
+                            MCVUDialsHelper.getCurrentHealthColors().get("red"),
+                            MCVUDialsHelper.getCurrentHealthColors().get("green"),
+                            MCVUDialsHelper.getCurrentHealthColors().get("blue"));
                     MCVUDialsControl.setDialImage(MCVUDialsHelper.dialUids[0], "health.png");
                 }
 
@@ -87,9 +92,13 @@ public class MCVUDials {
                 if (MCVUDialsHelper.dialUids.length >= 2) {
                     MCVUDialsHelper.setCurrentFoodLevelValuePercent(event.getEntity().getFoodData().getFoodLevel(), 20);
                     MCVUDialsHelper.setCurrentFoodLevelColors();
-                    
-                    MCVUDialsControl.setDialValue(MCVUDialsHelper.dialUids[1], MCVUDialsHelper.getCurrentFoodLevelValuePercent());
-                    MCVUDialsControl.setDialColor(MCVUDialsHelper.dialUids[1], MCVUDialsHelper.getCurrentFoodLevelColors().get("red"), MCVUDialsHelper.getCurrentFoodLevelColors().get("green"), MCVUDialsHelper.getCurrentFoodLevelColors().get("blue"));
+
+                    MCVUDialsControl.setDialValue(MCVUDialsHelper.dialUids[1],
+                            MCVUDialsHelper.getCurrentFoodLevelValuePercent());
+                    MCVUDialsControl.setDialColor(MCVUDialsHelper.dialUids[1],
+                            MCVUDialsHelper.getCurrentFoodLevelColors().get("red"),
+                            MCVUDialsHelper.getCurrentFoodLevelColors().get("green"),
+                            MCVUDialsHelper.getCurrentFoodLevelColors().get("blue"));
                     MCVUDialsControl.setDialImage(MCVUDialsHelper.dialUids[1], "food.png");
                 }
 
@@ -97,19 +106,28 @@ public class MCVUDials {
                 if (MCVUDialsHelper.dialUids.length >= 3) {
                     MCVUDialsHelper.setCurrentArmorValuePercent(event.getEntity().getArmorValue(), 20);
                     MCVUDialsHelper.setCurrentArmorColors();
-                    
-                    MCVUDialsControl.setDialValue(MCVUDialsHelper.dialUids[2], MCVUDialsHelper.getCurrentArmorValuePercent());
-                    MCVUDialsControl.setDialColor(MCVUDialsHelper.dialUids[2], MCVUDialsHelper.getCurrentArmorColors().get("red"), MCVUDialsHelper.getCurrentArmorColors().get("green"), MCVUDialsHelper.getCurrentArmorColors().get("blue"));
+
+                    MCVUDialsControl.setDialValue(MCVUDialsHelper.dialUids[2],
+                            MCVUDialsHelper.getCurrentArmorValuePercent());
+                    MCVUDialsControl.setDialColor(MCVUDialsHelper.dialUids[2],
+                            MCVUDialsHelper.getCurrentArmorColors().get("red"),
+                            MCVUDialsHelper.getCurrentArmorColors().get("green"),
+                            MCVUDialsHelper.getCurrentArmorColors().get("blue"));
                     MCVUDialsControl.setDialImage(MCVUDialsHelper.dialUids[2], "armor.png");
                 }
 
                 // Air
                 if (MCVUDialsHelper.dialUids.length >= 4) {
-                    MCVUDialsHelper.setCurrentAirValuePercent(event.getEntity().getAirSupply(), event.getEntity().getMaxAirSupply());
+                    MCVUDialsHelper.setCurrentAirValuePercent(event.getEntity().getAirSupply(),
+                            event.getEntity().getMaxAirSupply());
                     MCVUDialsHelper.setCurrentAirColors();
-                    
-                    MCVUDialsControl.setDialValue(MCVUDialsHelper.dialUids[3], MCVUDialsHelper.getCurrentAirValuePercent());
-                    MCVUDialsControl.setDialColor(MCVUDialsHelper.dialUids[3], MCVUDialsHelper.getCurrentAirColors().get("red"), MCVUDialsHelper.getCurrentAirColors().get("green"), MCVUDialsHelper.getCurrentAirColors().get("blue"));
+
+                    MCVUDialsControl.setDialValue(MCVUDialsHelper.dialUids[3],
+                            MCVUDialsHelper.getCurrentAirValuePercent());
+                    MCVUDialsControl.setDialColor(MCVUDialsHelper.dialUids[3],
+                            MCVUDialsHelper.getCurrentAirColors().get("red"),
+                            MCVUDialsHelper.getCurrentAirColors().get("green"),
+                            MCVUDialsHelper.getCurrentAirColors().get("blue"));
                     MCVUDialsControl.setDialImage(MCVUDialsHelper.dialUids[3], "air.png");
                 }
             }
@@ -156,15 +174,21 @@ public class MCVUDials {
                     && MCVUDialsHelper.dialUids.length >= 1) {
                 float entityMaxHealth = event.getEntity().self().getMaxHealth();
                 float entityCurrentHealth = event.getEntity().self().getHealth() - event.getAmount();
-                
-                if (MCVUDialsHelper.getCurrentHealthValuePercent() != Math.round((entityCurrentHealth * 100)/entityMaxHealth)) {
+
+                if (MCVUDialsHelper.getCurrentHealthValuePercent() != Math
+                        .round((entityCurrentHealth * 100) / entityMaxHealth)) {
                     MCVUDialsHelper.setCurrentHealthValuePercent(entityCurrentHealth, entityMaxHealth);
                     LOGGER.debug("Setting health dial to " + MCVUDialsHelper.getCurrentHealthValuePercent());
-                    MCVUDialsControl.setDialValue(MCVUDialsHelper.dialUids[0], MCVUDialsHelper.getCurrentHealthValuePercent());
+                    MCVUDialsControl.setDialValue(MCVUDialsHelper.dialUids[0],
+                            MCVUDialsHelper.getCurrentHealthValuePercent());
 
-                    if (! MCVUDialsHelper.getCurrentHealthColors().equals(MCVUDialsHelper.getNewHealthColors(MCVUDialsHelper.getCurrentHealthValuePercent()))) {
+                    if (!MCVUDialsHelper.getCurrentHealthColors().equals(
+                            MCVUDialsHelper.getNewHealthColors(MCVUDialsHelper.getCurrentHealthValuePercent()))) {
                         MCVUDialsHelper.setCurrentHealthColors();
-                        MCVUDialsControl.setDialColor(MCVUDialsHelper.dialUids[0], MCVUDialsHelper.getCurrentHealthColors().get("red"), MCVUDialsHelper.getCurrentHealthColors().get("green"), MCVUDialsHelper.getCurrentHealthColors().get("blue"));
+                        MCVUDialsControl.setDialColor(MCVUDialsHelper.dialUids[0],
+                                MCVUDialsHelper.getCurrentHealthColors().get("red"),
+                                MCVUDialsHelper.getCurrentHealthColors().get("green"),
+                                MCVUDialsHelper.getCurrentHealthColors().get("blue"));
                     }
                 }
             }
@@ -184,15 +208,21 @@ public class MCVUDials {
                     && MCVUDialsHelper.dialUids.length >= 1) {
                 float entityMaxHealth = event.getEntity().self().getMaxHealth();
                 float entityCurrentHealth = event.getEntity().self().getHealth() + event.getAmount();
-                
-                if (MCVUDialsHelper.getCurrentHealthValuePercent() != Math.round((entityCurrentHealth * 100)/entityMaxHealth)) {
+
+                if (MCVUDialsHelper.getCurrentHealthValuePercent() != Math
+                        .round((entityCurrentHealth * 100) / entityMaxHealth)) {
                     MCVUDialsHelper.setCurrentHealthValuePercent(entityCurrentHealth, entityMaxHealth);
                     LOGGER.debug("Setting health dial to " + MCVUDialsHelper.getCurrentHealthValuePercent());
-                    MCVUDialsControl.setDialValue(MCVUDialsHelper.dialUids[0], MCVUDialsHelper.getCurrentHealthValuePercent());
+                    MCVUDialsControl.setDialValue(MCVUDialsHelper.dialUids[0],
+                            MCVUDialsHelper.getCurrentHealthValuePercent());
 
-                    if (! MCVUDialsHelper.getCurrentHealthColors().equals(MCVUDialsHelper.getNewHealthColors(MCVUDialsHelper.getCurrentHealthValuePercent()))) {
+                    if (!MCVUDialsHelper.getCurrentHealthColors().equals(
+                            MCVUDialsHelper.getNewHealthColors(MCVUDialsHelper.getCurrentHealthValuePercent()))) {
                         MCVUDialsHelper.setCurrentHealthColors();
-                        MCVUDialsControl.setDialColor(MCVUDialsHelper.dialUids[0], MCVUDialsHelper.getCurrentHealthColors().get("red"), MCVUDialsHelper.getCurrentHealthColors().get("green"), MCVUDialsHelper.getCurrentHealthColors().get("blue"));
+                        MCVUDialsControl.setDialColor(MCVUDialsHelper.dialUids[0],
+                                MCVUDialsHelper.getCurrentHealthColors().get("red"),
+                                MCVUDialsHelper.getCurrentHealthColors().get("green"),
+                                MCVUDialsHelper.getCurrentHealthColors().get("blue"));
                     }
                 }
             }
@@ -205,36 +235,52 @@ public class MCVUDials {
 
     @SubscribeEvent
     public void onServerTick(PlayerTickEvent event) {
-        if (MCVUDialsHelper.getCurrentFoodLevelValuePercent() != Math.round((event.player.getFoodData().getFoodLevel()*100)/20)) {
+        if (MCVUDialsHelper.getCurrentFoodLevelValuePercent() != Math
+                .round((event.player.getFoodData().getFoodLevel() * 100) / 20)) {
             MCVUDialsHelper.setCurrentFoodLevelValuePercent(event.player.getFoodData().getFoodLevel(), 20);
             LOGGER.debug("Setting food dial to " + MCVUDialsHelper.getCurrentFoodLevelValuePercent());
-            MCVUDialsControl.setDialValue(MCVUDialsHelper.dialUids[1], MCVUDialsHelper.getCurrentFoodLevelValuePercent());
-            
-            if (! MCVUDialsHelper.getCurrentFoodLevelColors().equals(MCVUDialsHelper.getNewFoodLevelColors(MCVUDialsHelper.getCurrentFoodLevelValuePercent()))) {
+            MCVUDialsControl.setDialValue(MCVUDialsHelper.dialUids[1],
+                    MCVUDialsHelper.getCurrentFoodLevelValuePercent());
+
+            if (!MCVUDialsHelper.getCurrentFoodLevelColors()
+                    .equals(MCVUDialsHelper.getNewFoodLevelColors(MCVUDialsHelper.getCurrentFoodLevelValuePercent()))) {
                 MCVUDialsHelper.setCurrentFoodLevelColors();
-                MCVUDialsControl.setDialColor(MCVUDialsHelper.dialUids[1], MCVUDialsHelper.getCurrentFoodLevelColors().get("red"), MCVUDialsHelper.getCurrentFoodLevelColors().get("green"), MCVUDialsHelper.getCurrentFoodLevelColors().get("blue"));
+                MCVUDialsControl.setDialColor(MCVUDialsHelper.dialUids[1],
+                        MCVUDialsHelper.getCurrentFoodLevelColors().get("red"),
+                        MCVUDialsHelper.getCurrentFoodLevelColors().get("green"),
+                        MCVUDialsHelper.getCurrentFoodLevelColors().get("blue"));
             }
         }
 
-        if (MCVUDialsHelper.getCurrentArmorValuePercent() != Math.round((event.player.getArmorValue()*100)/20)) {
+        if (MCVUDialsHelper.getCurrentArmorValuePercent() != Math.round((event.player.getArmorValue() * 100) / 20)) {
             MCVUDialsHelper.setCurrentArmorValuePercent(event.player.getArmorValue(), 20);
             LOGGER.debug("Setting armor dial to " + MCVUDialsHelper.getCurrentArmorValuePercent());
             MCVUDialsControl.setDialValue(MCVUDialsHelper.dialUids[2], MCVUDialsHelper.getCurrentArmorValuePercent());
 
-            if (! MCVUDialsHelper.getCurrentArmorColors().equals(MCVUDialsHelper.getNewArmorColors(MCVUDialsHelper.getCurrentArmorValuePercent()))) {
+            if (!MCVUDialsHelper.getCurrentArmorColors()
+                    .equals(MCVUDialsHelper.getNewArmorColors(MCVUDialsHelper.getCurrentArmorValuePercent()))) {
                 MCVUDialsHelper.setCurrentArmorColors();
-                MCVUDialsControl.setDialColor(MCVUDialsHelper.dialUids[2], MCVUDialsHelper.getCurrentArmorColors().get("red"), MCVUDialsHelper.getCurrentArmorColors().get("green"), MCVUDialsHelper.getCurrentArmorColors().get("blue"));
+                MCVUDialsControl.setDialColor(MCVUDialsHelper.dialUids[2],
+                        MCVUDialsHelper.getCurrentArmorColors().get("red"),
+                        MCVUDialsHelper.getCurrentArmorColors().get("green"),
+                        MCVUDialsHelper.getCurrentArmorColors().get("blue"));
             }
         }
 
-        if (MCVUDialsHelper.getCurrentAirValuePercent() != Math.round((event.player.getAirSupply()*100)/event.player.getMaxAirSupply()) && Math.round((event.player.getAirSupply()*100)/event.player.getMaxAirSupply()) % 5 == 0 ) {
+        if (MCVUDialsHelper.getCurrentAirValuePercent() != Math
+                .round((event.player.getAirSupply() * 100) / event.player.getMaxAirSupply())
+                && Math.round((event.player.getAirSupply() * 100) / event.player.getMaxAirSupply()) % 5 == 0) {
             MCVUDialsHelper.setCurrentAirValuePercent(event.player.getAirSupply(), event.player.getMaxAirSupply());
             LOGGER.debug("Setting air dial to " + MCVUDialsHelper.getCurrentAirValuePercent());
             MCVUDialsControl.setDialValue(MCVUDialsHelper.dialUids[3], MCVUDialsHelper.getCurrentAirValuePercent());
-            
-            if (! MCVUDialsHelper.getCurrentAirColors().equals(MCVUDialsHelper.getNewAirColors(MCVUDialsHelper.getCurrentAirValuePercent()))) {
+
+            if (!MCVUDialsHelper.getCurrentAirColors()
+                    .equals(MCVUDialsHelper.getNewAirColors(MCVUDialsHelper.getCurrentAirValuePercent()))) {
                 MCVUDialsHelper.setCurrentAirColors();
-                MCVUDialsControl.setDialColor(MCVUDialsHelper.dialUids[3], MCVUDialsHelper.getCurrentAirColors().get("red"), MCVUDialsHelper.getCurrentAirColors().get("green"), MCVUDialsHelper.getCurrentAirColors().get("blue"));
+                MCVUDialsControl.setDialColor(MCVUDialsHelper.dialUids[3],
+                        MCVUDialsHelper.getCurrentAirColors().get("red"),
+                        MCVUDialsHelper.getCurrentAirColors().get("green"),
+                        MCVUDialsHelper.getCurrentAirColors().get("blue"));
             }
         }
     }
