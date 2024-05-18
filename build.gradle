@@ -115,6 +115,12 @@ publishing {
         register('mavenJava', MavenPublication) {
             artifact jar
         }
+        maven(MavenPublication) {
+            groupId = "de.plasticghoul.vudials"
+            artifactId = "mc-vudials_mc${minecraft_version}-${mod_version}.jar"
+            version = "${mod_version}"
+            from components.java
+        }
     }
     repositories {
         maven {
