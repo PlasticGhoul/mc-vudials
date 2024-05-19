@@ -119,8 +119,7 @@ publishing {
             version "${mod_version}"
 
             from components.java
-
-            artifact jar
+            jarJar.component(it)
             //artifact javadocJar
         }
     }
