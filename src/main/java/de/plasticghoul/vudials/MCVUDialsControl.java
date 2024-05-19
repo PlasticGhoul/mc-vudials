@@ -15,14 +15,27 @@ import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
+/**
+ * Main class that makes all API calls
+ */
 public class MCVUDialsControl {
     private static final Logger LOGGER = LogUtils.getLogger();
     private static Writer buffer = new StringWriter();
     private static PrintWriter printwriter = new PrintWriter(buffer);
 
+    /**
+     * Class constructor.
+     */
     public MCVUDialsControl() {
     }
 
+    /**
+     * Sets the value on the given dial.
+     * The value has to be an integer between 0 and 100.
+     * 
+     * @param   dialUid     The UID of the dial that will get the new value
+     * @param   dialValue   The new value that will be set on the dial
+     */
     public static void setDialValue(String dialUid, int dialValue) {
         HttpURLConnection connection = null;
 
@@ -62,6 +75,16 @@ public class MCVUDialsControl {
         }
     }
 
+    /**
+     * Sets the color on the given dial.
+     * Since the dials can only increase or decrese the LED of either red green or blue,
+     * the color has to be specified with a percantage value between 0-100
+     * 
+     * @param   dialUid     The UID of the dial that will get the new value
+     * @param   red         The brightness of the red LED
+     * @param   green       The brightness of the green LED
+     * @param   blue        The brightness of the blue LED
+     */
     public static void setDialColor(String dialUid, int red, int green, int blue) {
         HttpURLConnection connection = null;
 
@@ -101,6 +124,14 @@ public class MCVUDialsControl {
         }
     }
 
+    /**
+     * Sets the image on the given dial.
+     * The given image is pulled from within the jar file an therefore must be places inside the resources directory.
+     * This method will then perform a multipart/form-data upload.
+     * 
+     * @param   dialUid     The UID of the dial that will get the new value
+     * @param   dialImage   The new image that will be set on the dial
+     */
     public static void setDialImage(String dialUid, String dialImage) {
         try {
 

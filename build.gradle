@@ -75,6 +75,8 @@ jarJar {
     }
 }
 
+apply plugin: 'java'
+
 tasks.named('processResources', ProcessResources).configure {
     var replaceProperties = [
             minecraft_version: minecraft_version, minecraft_version_range: minecraft_version_range,
@@ -88,6 +90,10 @@ tasks.named('processResources', ProcessResources).configure {
     filesMatching(['META-INF/mods.toml', 'pack.mcmeta']) {
         expand replaceProperties + [project: project]
     }
+}
+
+tasks.named('javadoc', Javadoc).configure {
+    include "**/*.java"
 }
 
 tasks.named('jar', Jar).configure {
@@ -108,7 +114,14 @@ tasks.named('jar', Jar).configure {
 publishing {
     publications {
         register('mavenJava', MavenPublication) {
+            groupId "${mod_group_id}"
+            artifactId "${mod_id}"
+            version "${mod_version}"
+
+            from components.java
+
             artifact jar
+            //artifact javadocJar
         }
     }
     repositories {

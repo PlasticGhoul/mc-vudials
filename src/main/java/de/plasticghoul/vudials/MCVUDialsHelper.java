@@ -18,29 +18,60 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+/**
+ * Main class that manages all variables (get and set)
+ */
 public class MCVUDialsHelper {
     private static final Logger LOGGER = LogUtils.getLogger();
     private static Writer buffer = new StringWriter();
     private static PrintWriter printwriter = new PrintWriter(buffer);
+    
+    /** Saves the current VU Server status */
     public static boolean serverAvailable = false;
+
+    /** Has all currently available dial UIDs saved */
     public static String[] dialUids = null;
 
     // Dial Values
+    /** Current health value in percent as an integer (0-100) */
     public static int currentHealthValuePercent = 0;
+
+    /** Current food level value in percent as an integer (0-100) */
     public static int currentFoodLevelValuePercent = 0;
+
+    /** Current armor in percent as an integer (0-100) */
     public static int currentArmorValuePercent = 0;
+
+    /** Current air value in percent as an integer (0-100) */
     public static int currentAirValuePercent = 0;
 
     // Dial Colors
+    /** Current health LED color values as HashMap */
     public static HashMap<String, Integer> currentHealthColors = new HashMap<String, Integer>();
+    
+    /** Current food level LED color values as HashMap */
     public static HashMap<String, Integer> currentFoodLevelColors = new HashMap<String, Integer>();
+
+    /** Current armor LED color values as HashMap */
     public static HashMap<String, Integer> currentArmorColors = new HashMap<String, Integer>();
+
+    /** Current air LED color values as HashMap */
     public static HashMap<String, Integer> currentAirColors = new HashMap<String, Integer>();
 
+    /**
+     * Class constructor.
+     */
     public MCVUDialsHelper() {
     }
 
     // Util
+    /**
+     * This method tests if the VU Server is listening on the configured hostname and port.
+     * 
+     * @param   host    The hostname of the VU Server
+     * @param   port    The port on which the VU Server should listen
+     * @return          True if the server listens on the given hostname and port
+     */
     public static boolean isVUServerListening(String host, int port) {
         LOGGER.debug("Trying " + host + ":" + port + "...");
 
@@ -64,6 +95,13 @@ public class MCVUDialsHelper {
         }
     }
 
+    /**
+     * This method tests if the VU Server is answering to HTTP requests.
+     * 
+     * @param   apiBaseUrl  The base URL of the api server
+     * @param   apiKey      The API key which is needed in order to make requests against the API
+     * @return              True if the server answers on the given base url
+     */
     public static boolean isVUServerAnswering(String apiBaseUrl, String apiKey) {
         LOGGER.debug("Trying base URL " + MCVUDialsConfig.vuServerApiBaseUrl);
 
@@ -88,6 +126,11 @@ public class MCVUDialsHelper {
         }
     }
 
+    /**
+     * This method tests if the VU Server is listening and answering by calling isVUServerListening() and isVUServerAnswering().
+     *
+     * @return              True if the server listens and answers
+     */
     public static boolean isVUServerAvailable() {
         LOGGER.info("Try to reach API server...");
         if (isVUServerListening(MCVUDialsConfig.vuServerHostname, MCVUDialsConfig.vuServerPort)
@@ -102,6 +145,9 @@ public class MCVUDialsHelper {
         }
     }
 
+    /**
+     * This method is getting a list of dial UIDs so it can be used later on.
+     */
     public static void getDialUids() {
         JSONObject json = null;
 
@@ -130,36 +176,80 @@ public class MCVUDialsHelper {
     }
 
     // Dial Values
+    /**
+     * This method gets the currently set health value.
+     * 
+     * @return  The current health value as an integer
+     */
     public static int getCurrentHealthValuePercent() {
         return currentHealthValuePercent;
     }
 
+    /**
+     * This method calculates the new health value and saves it in a variable.
+     * 
+     * @param   newHealth   The new health value to be set (before percentage calculation)
+     * @param   maxHealth   The maximum possible health value
+     */
     public static void setCurrentHealthValuePercent(float newHealth, float maxHealth) {
         currentHealthValuePercent = Math.round((newHealth * 100) / maxHealth);
     }
 
+    /**
+     * This method gets the currently set food level value.
+     * 
+     * @return  The current food level value as an integer
+     */
     public static int getCurrentFoodLevelValuePercent() {
         return currentFoodLevelValuePercent;
     }
 
+    /**
+     * This method calculates the new food level value and saves it in a variable.
+     * 
+     * @param   newFoodLevel    The new food level value to be set (before percentage calculation)
+     * @param   maxFoodLevel    The maximum possible food level value
+     */
     public static void setCurrentFoodLevelValuePercent(int newFoodLevel, int maxFoodLevel) {
 
         currentFoodLevelValuePercent = Math.round((newFoodLevel * 100) / maxFoodLevel);
     }
 
+    /**
+     * This method gets the currently set armor value.
+     * 
+     * @return  The current armor value as an integer
+     */
     public static int getCurrentArmorValuePercent() {
         return currentArmorValuePercent;
     }
 
+    /**
+     * This method calculates the new armor value and saves it in a variable.
+     * 
+     * @param   newArmor    The new armor value to be set (before percentage calculation)
+     * @param   maxArmor    The maximum possible armor value
+     */
     public static void setCurrentArmorValuePercent(int newArmor, int maxArmor) {
 
         currentArmorValuePercent = Math.round((newArmor * 100) / maxArmor);
     }
 
+    /**
+     * This method gets the currently set air value.
+     * 
+     * @return  The current air value as an integer
+     */
     public static int getCurrentAirValuePercent() {
         return currentAirValuePercent;
     }
 
+    /**
+     * This method calculates the new air value and saves it in a variable.
+     * 
+     * @param   newAir    The new air value to be set (before percentage calculation)
+     * @param   maxAir    The maximum possible air value
+     */
     public static void setCurrentAirValuePercent(int newAir, int maxAir) {
         if (newAir < 0) {
             newAir = 0;
@@ -168,10 +258,22 @@ public class MCVUDialsHelper {
     }
 
     // Dial Colors
+    /**
+     * This method gets the currently set health colors.
+     * 
+     * @return  The current health colors as a HashMap
+     */
     public static HashMap<String, Integer> getCurrentHealthColors() {
         return currentHealthColors;
     }
 
+    /**
+     * This method calculates the new health color based on the given health value and saves it in a HashMap.
+     * This is needed to later compare the new and the current colors in order to reduce API calls.
+     * 
+     * @param   newHealth   The new health value to be set (before percentage calculation)
+     * @return              Returns a HashMap with possible new color values for comparison with the current set color values
+     */
     public static HashMap<String, Integer> getNewHealthColors(int newHealth) {
         HashMap<String, Integer> newHealthColors = new HashMap<String, Integer>();
 
@@ -192,6 +294,9 @@ public class MCVUDialsHelper {
         return newHealthColors;
     }
 
+    /**
+     * This method calculates the current health color based on the given health value and saves it in a HashMap.
+     */
     public static void setCurrentHealthColors() {
         if (getCurrentHealthValuePercent() > 50) {
             LOGGER.debug("Setting health dial color to green");
@@ -214,10 +319,22 @@ public class MCVUDialsHelper {
         }
     }
 
+    /**
+     * This method gets the currently set food level colors.
+     * 
+     * @return  The current food level colors as a HashMap
+     */
     public static HashMap<String, Integer> getCurrentFoodLevelColors() {
         return currentFoodLevelColors;
     }
 
+    /**
+     * This method calculates the new food level color based on the given food level value and saves it in a HashMap.
+     * This is needed to later compare the new and the current colors in order to reduce API calls.
+     * 
+     * @param   newFoodLevel    The new food level value to be set (before percentage calculation)
+     * @return                  Returns a HashMap with possible new color values for comparison with the current set color values
+     */
     public static HashMap<String, Integer> getNewFoodLevelColors(int newFoodLevel) {
         HashMap<String, Integer> newFoodLevelColors = new HashMap<String, Integer>();
 
@@ -238,6 +355,9 @@ public class MCVUDialsHelper {
         return newFoodLevelColors;
     }
 
+    /**
+     * This method calculates the current food level color based on the currently set food level value and saves it in a HashMap.
+     */
     public static void setCurrentFoodLevelColors() {
         if (getCurrentFoodLevelValuePercent() > 50) {
             LOGGER.debug("Setting food dial color to green");
@@ -260,10 +380,22 @@ public class MCVUDialsHelper {
         }
     }
 
+    /**
+     * This method gets the currently set armor colors.
+     * 
+     * @return  The current armor colors as a HashMap
+     */
     public static HashMap<String, Integer> getCurrentArmorColors() {
         return currentArmorColors;
     }
 
+    /**
+     * This method calculates the new armor color based on the given armor value and saves it in a HashMap.
+     * This is needed to later compare the new and the current colors in order to reduce API calls.
+     * 
+     * @param   newArmor    The new armor value to be set (before percentage calculation)
+     * @return              Returns a HashMap with possible new color values for comparison with the current set color values
+     */
     public static HashMap<String, Integer> getNewArmorColors(int newArmor) {
         HashMap<String, Integer> newArmorColors = new HashMap<String, Integer>();
 
@@ -284,6 +416,9 @@ public class MCVUDialsHelper {
         return newArmorColors;
     }
 
+    /**
+     * This method calculates the current armor color based on the currently set armor value and saves it in a HashMap.
+     */
     public static void setCurrentArmorColors() {
         if (getCurrentArmorValuePercent() > 50) {
             LOGGER.debug("Setting armor dial color to green");
@@ -306,10 +441,22 @@ public class MCVUDialsHelper {
         }
     }
 
+    /**
+     * This method gets the currently set air colors.
+     * 
+     * @return  The current air colors as a HashMap
+     */
     public static HashMap<String, Integer> getCurrentAirColors() {
         return currentAirColors;
     }
 
+    /**
+     * This method calculates the new air color based on the given air value and saves it in a HashMap.
+     * This is needed to later compare the new and the current colors in order to reduce API calls.
+     * 
+     * @param   newAir  The new air value to be set (before percentage calculation)
+     * @return          Returns a HashMap with possible new color values for comparison with the current set color values
+     */
     public static HashMap<String, Integer> getNewAirColors(int newAir) {
         HashMap<String, Integer> newAirColors = new HashMap<String, Integer>();
 
@@ -330,6 +477,9 @@ public class MCVUDialsHelper {
         return newAirColors;
     }
 
+    /**
+     * This method calculates the current air color based on the currently set air value and saves it in a HashMap.
+     */
     public static void setCurrentAirColors() {
         if (getCurrentAirValuePercent() > 50) {
             LOGGER.debug("Setting air dial color to green");

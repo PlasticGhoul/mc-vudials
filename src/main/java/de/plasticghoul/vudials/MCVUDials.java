@@ -23,13 +23,20 @@ import net.minecraftforge.event.entity.player.PlayerEvent.PlayerLoggedInEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent.PlayerLoggedOutEvent;
 import net.minecraftforge.event.TickEvent.PlayerTickEvent;
 
+/**
+ * Main class that triggers all the events
+ */
 @Mod(MCVUDials.MODID)
 public class MCVUDials {
+    /** Mod ID for reference by forge */
     public static final String MODID = "mcvudials";
     private static final Logger LOGGER = LogUtils.getLogger();
     private static Writer buffer = new StringWriter();
     private static PrintWriter printwriter = new PrintWriter(buffer);
 
+    /**
+     * Class constructor.
+     */
     public MCVUDials() {
         IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
         modEventBus.addListener(this::commonSetup);
@@ -39,6 +46,12 @@ public class MCVUDials {
         ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, MCVUDialsConfig.SPEC);
     }
 
+    /**
+     * This event method triggers when the mod loader starts and loads this mod
+     * If the API key is set, this event will be cancelled so the mod will not load
+     * 
+     * @param   event   The FMLCommonSetupEvent that is needed so this method triggers
+     */
     private void commonSetup(final FMLCommonSetupEvent event) {
         LOGGER.info("Common Setup started...");
 
@@ -55,6 +68,12 @@ public class MCVUDials {
         LOGGER.info("Common Setup finished...");
     }
 
+    /**
+     * This event method triggers when the minecraft server starts (the world is loaded)
+     * During this event, the mod tries to get all the dial UIDs
+     * 
+     * @param   event   The ServerStartingEvent that is needed so this method triggers
+     */
     @SubscribeEvent
     public void onServerStarting(ServerStartingEvent event) {
 
@@ -67,6 +86,12 @@ public class MCVUDials {
 
     }
 
+    /**
+     * This event method triggers when the player joins a world
+     * During this event, all initial dial values, colors and images will be set
+     * 
+     * @param   event   The PlayerLoggedInEvent that is needed so this method triggers
+     */
     @SubscribeEvent
     public void onLoggedIn(PlayerLoggedInEvent event) {
         if (MCVUDialsConfig.vuServerEnabled && MCVUDialsHelper.isVUServerAvailable()) {
@@ -134,6 +159,12 @@ public class MCVUDials {
         }
     }
 
+    /**
+     * This event method triggers when the player leaves a world
+     * During this event, all dial values, colors and images will be reset
+     * 
+     * @param   event   The PlayerLoggedOutEvent that is needed so this method triggers
+     */
     @SubscribeEvent
     public void onLoggedOut(PlayerLoggedOutEvent event) {
         if (MCVUDialsConfig.vuServerEnabled && MCVUDialsHelper.serverAvailable) {
@@ -165,6 +196,12 @@ public class MCVUDials {
         }
     }
 
+    /**
+     * This event method triggers when the player is hurt
+     * During this event, the health value and color can be updated
+     * 
+     * @param   event   The LivingHurtEvent that is needed so this method triggers
+     */
     @SuppressWarnings("null")
     @SubscribeEvent
     public void onEntityHurt(LivingHurtEvent event) {
@@ -199,6 +236,12 @@ public class MCVUDials {
         }
     }
 
+    /**
+     * This event method triggers when the player is healing
+     * During this event, the health value and color can be updated
+     * 
+     * @param   event   The LivingHealEvent that is needed so this method triggers
+     */
     @SuppressWarnings("null")
     @SubscribeEvent
     public void onEntityHeal(LivingHealEvent event) {
@@ -233,8 +276,15 @@ public class MCVUDials {
         }
     }
 
+    /**
+     * This event method triggers on each player tick.
+     * Since there are no events for air, armor or food level changes, it has to be on each player tick.
+     * During this event, the armor, air or food level value and color can be updated
+     * 
+     * @param   event   The PlayerTickEvent that is needed so this method triggers
+     */
     @SubscribeEvent
-    public void onServerTick(PlayerTickEvent event) {
+    public void onPlayerTick(PlayerTickEvent event) {
         if (MCVUDialsHelper.getCurrentFoodLevelValuePercent() != Math
                 .round((event.player.getFoodData().getFoodLevel() * 100) / 20)) {
             MCVUDialsHelper.setCurrentFoodLevelValuePercent(event.player.getFoodData().getFoodLevel(), 20);
