@@ -1,0 +1,1 @@
+typeSearchIndex = [{"l":"All Classes and Interfaces","u":"allclasses-index.html"},{"p":"de.plasticghoul.vudials","l":"MCVUDials"},{"p":"de.plasticghoul.vudials","l":"MCVUDialsConfig"},{"p":"de.plasticghoul.vudials","l":"MCVUDialsControl"},{"p":"de.plasticghoul.vudials","l":"MCVUDialsHelper"}];updateSearchResults();
