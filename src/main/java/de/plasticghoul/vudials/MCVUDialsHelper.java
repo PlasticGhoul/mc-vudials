@@ -8,10 +8,11 @@ import java.io.PrintWriter;
 import java.io.Writer;
 import java.io.StringWriter;
 import java.util.HashMap;
+import java.util.Map;
 import java.net.Socket;
 import java.net.URL;
 import java.net.HttpURLConnection;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 
 import org.apache.commons.io.IOUtils;
 import org.json.JSONArray;
@@ -27,41 +28,33 @@ public class MCVUDialsHelper {
     private static PrintWriter printwriter = new PrintWriter(buffer);
     
     /** Saves the current VU Server status */
-    public static boolean serverAvailable = false;
+    private static boolean serverAvailable = false;
 
     /** Has all currently available dial UIDs saved */
-    public static String[] dialUids = null;
+    private static String[] dialUids = null;
 
     // Dial Values
-    /** Current health value in percent as an integer (0-100) */
-    public static int currentHealthValuePercent = 0;
-
-    /** Current food level value in percent as an integer (0-100) */
-    public static int currentFoodLevelValuePercent = 0;
-
-    /** Current armor in percent as an integer (0-100) */
-    public static int currentArmorValuePercent = 0;
-
-    /** Current air value in percent as an integer (0-100) */
-    public static int currentAirValuePercent = 0;
+    private static int currentHealthValuePercent = 0;
+    private static int currentFoodLevelValuePercent = 0;
+    private static int currentArmorValuePercent = 0;
+    private static int currentAirValuePercent = 0;
 
     // Dial Colors
-    /** Current health LED color values as HashMap */
-    public static HashMap<String, Integer> currentHealthColors = new HashMap<String, Integer>();
+    private static HashMap<String, Integer> currentHealthColors = new HashMap<>();
+    private static HashMap<String, Integer> currentFoodLevelColors = new HashMap<>();
+    private static HashMap<String, Integer> currentArmorColors = new HashMap<>();
+    private static HashMap<String, Integer> currentAirColors = new HashMap<>();
+
+    // Color constants
+    private static final String COLORRED = "red";
+    private static final String COLORGREEN = "green";
+    private static final String COLORBLUE = "blue";
     
-    /** Current food level LED color values as HashMap */
-    public static HashMap<String, Integer> currentFoodLevelColors = new HashMap<String, Integer>();
-
-    /** Current armor LED color values as HashMap */
-    public static HashMap<String, Integer> currentArmorColors = new HashMap<String, Integer>();
-
-    /** Current air LED color values as HashMap */
-    public static HashMap<String, Integer> currentAirColors = new HashMap<String, Integer>();
-
     /**
      * Class constructor.
      */
-    public MCVUDialsHelper() {
+    private MCVUDialsHelper() {
+        throw new IllegalStateException("Utility class");
     }
 
     // Util
@@ -73,25 +66,20 @@ public class MCVUDialsHelper {
      * @return          True if the server listens on the given hostname and port
      */
     public static boolean isVUServerListening(String host, int port) {
-        LOGGER.debug("Trying " + host + ":" + port + "...");
+        LOGGER.debug("Trying {}{}{}{}", host, ":{}", port, "...");
 
-        Socket socket = null;
-        try {
-            socket = new Socket(host, port);
-            LOGGER.debug("Found running VU Server instance.");
-            return true;
+        try(Socket socket = new Socket(host, port)) {
+            if (socket.isConnected()) {
+                LOGGER.debug("Found running VU Server instance.");
+                return true;
+            } else {
+                return false;
+            }
         } catch (Exception exception) {
             LOGGER.error("No running VU Server instance found!");
             exception.printStackTrace(printwriter);
             LOGGER.error(buffer.toString());
             return false;
-        } finally {
-            if (socket != null) {
-                try {
-                    socket.close();
-                } catch (Exception exception) {
-                }
-            }
         }
     }
 
@@ -103,7 +91,7 @@ public class MCVUDialsHelper {
      * @return              True if the server answers on the given base url
      */
     public static boolean isVUServerAnswering(String apiBaseUrl, String apiKey) {
-        LOGGER.debug("Trying base URL " + MCVUDialsConfig.vuServerApiBaseUrl);
+        LOGGER.debug("Trying base URL {}", MCVUDialsConfig.getVuServerApiBaseUrl());
 
         int httpStatusCode = 0;
 
@@ -122,6 +110,7 @@ public class MCVUDialsHelper {
             LOGGER.debug("API server answered successful.");
             return true;
         } else {
+            LOGGER.warn("Cannot create connection to API: {}{}", apiBaseUrl, "/api/v0/dial/list?key=xxx");
             return false;
         }
     }
@@ -131,32 +120,35 @@ public class MCVUDialsHelper {
      *
      * @return              True if the server listens and answers
      */
-    public static boolean isVUServerAvailable() {
+    public static void setIsVUserverAvailable() {
         LOGGER.info("Try to reach API server...");
-        if (isVUServerListening(MCVUDialsConfig.vuServerHostname, MCVUDialsConfig.vuServerPort)
-                && isVUServerAnswering(MCVUDialsConfig.vuServerApiBaseUrl, MCVUDialsConfig.vuServerApiKey)) {
+        if (isVUServerListening(MCVUDialsConfig.getVuServerHostname(), MCVUDialsConfig.getVuServerPort())
+                && isVUServerAnswering(MCVUDialsConfig.getVuServerApiBaseUrl(), MCVUDialsConfig.getVuServerApiKey())) {
             LOGGER.info("API server listening and answering.");
             serverAvailable = true;
-            return serverAvailable;
         } else {
-            LOGGER.error("API server either not listening or answeing!");
+            LOGGER.error("API server either not listening or answering!");
             serverAvailable = false;
-            return serverAvailable;
+
         }
+    }
+
+    public static boolean isVUserverAvailable() {
+        return serverAvailable;
     }
 
     /**
      * This method is getting a list of dial UIDs so it can be used later on.
      */
-    public static void getDialUids() {
+    public static void setDialUids() {
         JSONObject json = null;
 
         LOGGER.info("Getting dial UIDs...");
 
         try {
             json = new JSONObject(IOUtils.toString(new URL(
-                    MCVUDialsConfig.vuServerApiBaseUrl + "/api/v0/dial/list?key=" + MCVUDialsConfig.vuServerApiKey),
-                    Charset.forName("UTF-8")));
+                    MCVUDialsConfig.getVuServerApiBaseUrl() + "/api/v0/dial/list?key=" + MCVUDialsConfig.getVuServerApiKey()),
+                    StandardCharsets.UTF_8));
         } catch (JSONException | IOException exception) {
             LOGGER.error("Error getting dials stats!");
             exception.printStackTrace(printwriter);
@@ -170,9 +162,13 @@ public class MCVUDialsHelper {
 
             for (int i = 0; i < dialsCount; i++) {
                 dialUids[i] = jsonArray.getJSONObject(i).getString("uid");
-                LOGGER.debug("Dial " + i + 1 + " UID: " + dialUids[i]);
+                LOGGER.debug("Dial {} {} {}", i, " UID:", dialUids[i]);
             }
         }
+    }
+
+    public static String[] getDialUids() {
+        return dialUids;
     }
 
     // Dial Values
@@ -210,8 +206,7 @@ public class MCVUDialsHelper {
      * @param   newFoodLevel    The new food level value to be set (before percentage calculation)
      * @param   maxFoodLevel    The maximum possible food level value
      */
-    public static void setCurrentFoodLevelValuePercent(int newFoodLevel, int maxFoodLevel) {
-
+    public static void setCurrentFoodLevelValuePercent(float newFoodLevel, int maxFoodLevel) {
         currentFoodLevelValuePercent = Math.round((newFoodLevel * 100) / maxFoodLevel);
     }
 
@@ -230,7 +225,7 @@ public class MCVUDialsHelper {
      * @param   newArmor    The new armor value to be set (before percentage calculation)
      * @param   maxArmor    The maximum possible armor value
      */
-    public static void setCurrentArmorValuePercent(int newArmor, int maxArmor) {
+    public static void setCurrentArmorValuePercent(float newArmor, int maxArmor) {
 
         currentArmorValuePercent = Math.round((newArmor * 100) / maxArmor);
     }
@@ -250,7 +245,7 @@ public class MCVUDialsHelper {
      * @param   newAir    The new air value to be set (before percentage calculation)
      * @param   maxAir    The maximum possible air value
      */
-    public static void setCurrentAirValuePercent(int newAir, int maxAir) {
+    public static void setCurrentAirValuePercent(float newAir, int maxAir) {
         if (newAir < 0) {
             newAir = 0;
         }
@@ -263,7 +258,7 @@ public class MCVUDialsHelper {
      * 
      * @return  The current health colors as a HashMap
      */
-    public static HashMap<String, Integer> getCurrentHealthColors() {
+    public static Map<String, Integer> getCurrentHealthColors() {
         return currentHealthColors;
     }
 
@@ -274,21 +269,21 @@ public class MCVUDialsHelper {
      * @param   newHealth   The new health value to be set (before percentage calculation)
      * @return              Returns a HashMap with possible new color values for comparison with the current set color values
      */
-    public static HashMap<String, Integer> getNewHealthColors(int newHealth) {
-        HashMap<String, Integer> newHealthColors = new HashMap<String, Integer>();
+    public static Map<String, Integer> getNewHealthColors(int newHealth) {
+        HashMap<String, Integer> newHealthColors = new HashMap<>();
 
         if (newHealth > 50) {
-            newHealthColors.put("red", 0);
-            newHealthColors.put("green", 100);
-            newHealthColors.put("blue", 0);
+            newHealthColors.put(COLORRED, 0);
+            newHealthColors.put(COLORGREEN, 100);
+            newHealthColors.put(COLORBLUE, 0);
         } else if (newHealth > 20) {
-            newHealthColors.put("red", 100);
-            newHealthColors.put("green", 100);
-            newHealthColors.put("blue", 0);
+            newHealthColors.put(COLORRED, 100);
+            newHealthColors.put(COLORGREEN, 100);
+            newHealthColors.put(COLORBLUE, 0);
         } else if (newHealth <= 20) {
-            newHealthColors.put("red", 100);
-            newHealthColors.put("green", 0);
-            newHealthColors.put("blue", 0);
+            newHealthColors.put(COLORRED, 100);
+            newHealthColors.put(COLORGREEN, 0);
+            newHealthColors.put(COLORBLUE, 0);
         }
 
         return newHealthColors;
@@ -301,21 +296,21 @@ public class MCVUDialsHelper {
         if (getCurrentHealthValuePercent() > 50) {
             LOGGER.debug("Setting health dial color to green");
 
-            currentHealthColors.put("red", 0);
-            currentHealthColors.put("green", 100);
-            currentHealthColors.put("blue", 0);
+            currentHealthColors.put(COLORRED, 0);
+            currentHealthColors.put(COLORGREEN, 100);
+            currentHealthColors.put(COLORBLUE, 0);
         } else if (getCurrentHealthValuePercent() > 20) {
             LOGGER.debug("Setting health dial color to yellow");
 
-            currentHealthColors.put("red", 100);
-            currentHealthColors.put("green", 100);
-            currentHealthColors.put("blue", 0);
+            currentHealthColors.put(COLORRED, 100);
+            currentHealthColors.put(COLORGREEN, 100);
+            currentHealthColors.put(COLORBLUE, 0);
         } else if (getCurrentHealthValuePercent() <= 20) {
             LOGGER.debug("Setting health dial color to red");
 
-            currentHealthColors.put("red", 100);
-            currentHealthColors.put("green", 0);
-            currentHealthColors.put("blue", 0);
+            currentHealthColors.put(COLORRED, 100);
+            currentHealthColors.put(COLORGREEN, 0);
+            currentHealthColors.put(COLORBLUE, 0);
         }
     }
 
@@ -324,7 +319,7 @@ public class MCVUDialsHelper {
      * 
      * @return  The current food level colors as a HashMap
      */
-    public static HashMap<String, Integer> getCurrentFoodLevelColors() {
+    public static Map<String, Integer> getCurrentFoodLevelColors() {
         return currentFoodLevelColors;
     }
 
@@ -335,21 +330,21 @@ public class MCVUDialsHelper {
      * @param   newFoodLevel    The new food level value to be set (before percentage calculation)
      * @return                  Returns a HashMap with possible new color values for comparison with the current set color values
      */
-    public static HashMap<String, Integer> getNewFoodLevelColors(int newFoodLevel) {
-        HashMap<String, Integer> newFoodLevelColors = new HashMap<String, Integer>();
+    public static Map<String, Integer> getNewFoodLevelColors(int newFoodLevel) {
+        HashMap<String, Integer> newFoodLevelColors = new HashMap<>();
 
         if (newFoodLevel > 50) {
-            newFoodLevelColors.put("red", 0);
-            newFoodLevelColors.put("green", 100);
-            newFoodLevelColors.put("blue", 0);
+            newFoodLevelColors.put(COLORRED, 0);
+            newFoodLevelColors.put(COLORGREEN, 100);
+            newFoodLevelColors.put(COLORBLUE, 0);
         } else if (newFoodLevel > 30) {
-            newFoodLevelColors.put("red", 100);
-            newFoodLevelColors.put("green", 100);
-            newFoodLevelColors.put("blue", 0);
+            newFoodLevelColors.put(COLORRED, 100);
+            newFoodLevelColors.put(COLORGREEN, 100);
+            newFoodLevelColors.put(COLORBLUE, 0);
         } else if (newFoodLevel <= 30) {
-            newFoodLevelColors.put("red", 100);
-            newFoodLevelColors.put("green", 0);
-            newFoodLevelColors.put("blue", 0);
+            newFoodLevelColors.put(COLORRED, 100);
+            newFoodLevelColors.put(COLORGREEN, 0);
+            newFoodLevelColors.put(COLORBLUE, 0);
         }
 
         return newFoodLevelColors;
@@ -362,21 +357,21 @@ public class MCVUDialsHelper {
         if (getCurrentFoodLevelValuePercent() > 50) {
             LOGGER.debug("Setting food dial color to green");
 
-            currentFoodLevelColors.put("red", 0);
-            currentFoodLevelColors.put("green", 100);
-            currentFoodLevelColors.put("blue", 0);
+            currentFoodLevelColors.put(COLORRED, 0);
+            currentFoodLevelColors.put(COLORGREEN, 100);
+            currentFoodLevelColors.put(COLORBLUE, 0);
         } else if (getCurrentFoodLevelValuePercent() > 30) {
             LOGGER.debug("Setting food dial color to yellow");
 
-            currentFoodLevelColors.put("red", 100);
-            currentFoodLevelColors.put("green", 100);
-            currentFoodLevelColors.put("blue", 0);
+            currentFoodLevelColors.put(COLORRED, 100);
+            currentFoodLevelColors.put(COLORGREEN, 100);
+            currentFoodLevelColors.put(COLORBLUE, 0);
         } else if (getCurrentFoodLevelValuePercent() <= 30) {
             LOGGER.debug("Setting food dial color to red");
 
-            currentFoodLevelColors.put("red", 100);
-            currentFoodLevelColors.put("green", 0);
-            currentFoodLevelColors.put("blue", 0);
+            currentFoodLevelColors.put(COLORRED, 100);
+            currentFoodLevelColors.put(COLORGREEN, 0);
+            currentFoodLevelColors.put(COLORBLUE, 0);
         }
     }
 
@@ -385,7 +380,7 @@ public class MCVUDialsHelper {
      * 
      * @return  The current armor colors as a HashMap
      */
-    public static HashMap<String, Integer> getCurrentArmorColors() {
+    public static Map<String, Integer> getCurrentArmorColors() {
         return currentArmorColors;
     }
 
@@ -396,21 +391,21 @@ public class MCVUDialsHelper {
      * @param   newArmor    The new armor value to be set (before percentage calculation)
      * @return              Returns a HashMap with possible new color values for comparison with the current set color values
      */
-    public static HashMap<String, Integer> getNewArmorColors(int newArmor) {
-        HashMap<String, Integer> newArmorColors = new HashMap<String, Integer>();
+    public static Map<String, Integer> getNewArmorColors(int newArmor) {
+        HashMap<String, Integer> newArmorColors = new HashMap<>();
 
         if (newArmor > 50) {
-            newArmorColors.put("red", 0);
-            newArmorColors.put("green", 100);
-            newArmorColors.put("blue", 0);
+            newArmorColors.put(COLORRED, 0);
+            newArmorColors.put(COLORGREEN, 100);
+            newArmorColors.put(COLORBLUE, 0);
         } else if (newArmor > 30) {
-            newArmorColors.put("red", 100);
-            newArmorColors.put("green", 100);
-            newArmorColors.put("blue", 0);
+            newArmorColors.put(COLORRED, 100);
+            newArmorColors.put(COLORGREEN, 100);
+            newArmorColors.put(COLORBLUE, 0);
         } else if (newArmor <= 30) {
-            newArmorColors.put("red", 100);
-            newArmorColors.put("green", 0);
-            newArmorColors.put("blue", 0);
+            newArmorColors.put(COLORRED, 100);
+            newArmorColors.put(COLORGREEN, 0);
+            newArmorColors.put(COLORBLUE, 0);
         }
 
         return newArmorColors;
@@ -423,21 +418,21 @@ public class MCVUDialsHelper {
         if (getCurrentArmorValuePercent() > 50) {
             LOGGER.debug("Setting armor dial color to green");
 
-            currentArmorColors.put("red", 0);
-            currentArmorColors.put("green", 100);
-            currentArmorColors.put("blue", 0);
+            currentArmorColors.put(COLORRED, 0);
+            currentArmorColors.put(COLORGREEN, 100);
+            currentArmorColors.put(COLORBLUE, 0);
         } else if (getCurrentArmorValuePercent() > 30) {
             LOGGER.debug("Setting armor dial color to yellow");
 
-            currentArmorColors.put("red", 100);
-            currentArmorColors.put("green", 100);
-            currentArmorColors.put("blue", 0);
+            currentArmorColors.put(COLORRED, 100);
+            currentArmorColors.put(COLORGREEN, 100);
+            currentArmorColors.put(COLORBLUE, 0);
         } else if (getCurrentArmorValuePercent() <= 30) {
             LOGGER.debug("Setting armor dial color to red");
 
-            currentArmorColors.put("red", 100);
-            currentArmorColors.put("green", 0);
-            currentArmorColors.put("blue", 0);
+            currentArmorColors.put(COLORRED, 100);
+            currentArmorColors.put(COLORGREEN, 0);
+            currentArmorColors.put(COLORBLUE, 0);
         }
     }
 
@@ -446,7 +441,7 @@ public class MCVUDialsHelper {
      * 
      * @return  The current air colors as a HashMap
      */
-    public static HashMap<String, Integer> getCurrentAirColors() {
+    public static Map<String, Integer> getCurrentAirColors() {
         return currentAirColors;
     }
 
@@ -457,21 +452,21 @@ public class MCVUDialsHelper {
      * @param   newAir  The new air value to be set (before percentage calculation)
      * @return          Returns a HashMap with possible new color values for comparison with the current set color values
      */
-    public static HashMap<String, Integer> getNewAirColors(int newAir) {
-        HashMap<String, Integer> newAirColors = new HashMap<String, Integer>();
+    public static Map<String, Integer> getNewAirColors(int newAir) {
+        HashMap<String, Integer> newAirColors = new HashMap<>();
 
         if (newAir > 50) {
-            newAirColors.put("red", 0);
-            newAirColors.put("green", 100);
-            newAirColors.put("blue", 0);
+            newAirColors.put(COLORRED, 0);
+            newAirColors.put(COLORGREEN, 100);
+            newAirColors.put(COLORBLUE, 0);
         } else if (newAir > 30) {
-            newAirColors.put("red", 100);
-            newAirColors.put("green", 100);
-            newAirColors.put("blue", 0);
+            newAirColors.put(COLORRED, 100);
+            newAirColors.put(COLORGREEN, 100);
+            newAirColors.put(COLORBLUE, 0);
         } else if (newAir <= 30) {
-            newAirColors.put("red", 100);
-            newAirColors.put("green", 0);
-            newAirColors.put("blue", 0);
+            newAirColors.put(COLORRED, 100);
+            newAirColors.put(COLORGREEN, 0);
+            newAirColors.put(COLORBLUE, 0);
         }
 
         return newAirColors;
@@ -484,21 +479,21 @@ public class MCVUDialsHelper {
         if (getCurrentAirValuePercent() > 50) {
             LOGGER.debug("Setting air dial color to green");
 
-            currentAirColors.put("red", 0);
-            currentAirColors.put("green", 100);
-            currentAirColors.put("blue", 0);
+            currentAirColors.put(COLORRED, 0);
+            currentAirColors.put(COLORGREEN, 100);
+            currentAirColors.put(COLORBLUE, 0);
         } else if (getCurrentAirValuePercent() > 30) {
             LOGGER.debug("Setting air dial color to yellow");
 
-            currentAirColors.put("red", 100);
-            currentAirColors.put("green", 100);
-            currentAirColors.put("blue", 0);
+            currentAirColors.put(COLORRED, 100);
+            currentAirColors.put(COLORGREEN, 100);
+            currentAirColors.put(COLORBLUE, 0);
         } else if (getCurrentAirValuePercent() <= 30) {
             LOGGER.debug("Setting air dial color to red");
 
-            currentAirColors.put("red", 100);
-            currentAirColors.put("green", 0);
-            currentAirColors.put("blue", 0);
+            currentAirColors.put(COLORRED, 100);
+            currentAirColors.put(COLORGREEN, 0);
+            currentAirColors.put(COLORBLUE, 0);
         }
     }
 

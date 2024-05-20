@@ -14,6 +14,7 @@ import java.io.BufferedReader;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 
 /**
  * Main class that makes all API calls
@@ -23,26 +24,29 @@ public class MCVUDialsControl {
     private static Writer buffer = new StringWriter();
     private static PrintWriter printwriter = new PrintWriter(buffer);
 
+    private static final String APIPATH = "/api/v0/dial/";
+
     /**
      * Class constructor.
      */
-    public MCVUDialsControl() {
+    private MCVUDialsControl() {
+        throw new IllegalStateException("Utility class");
     }
 
     /**
      * Sets the value on the given dial.
      * The value has to be an integer between 0 and 100.
      * 
-     * @param   dialUid     The UID of the dial that will get the new value
-     * @param   dialValue   The new value that will be set on the dial
+     * @param dialUid   The UID of the dial that will get the new value
+     * @param dialValue The new value that will be set on the dial
      */
     public static void setDialValue(String dialUid, int dialValue) {
         HttpURLConnection connection = null;
 
         try {
 
-            String apiUrl = MCVUDialsConfig.vuServerApiBaseUrl + "/api/v0/dial/" + dialUid + "/set?key="
-                    + MCVUDialsConfig.vuServerApiKey + "&value=" + dialValue;
+            String apiUrl = MCVUDialsConfig.getVuServerApiBaseUrl() + APIPATH + dialUid + "/set?key="
+                    + MCVUDialsConfig.getVuServerApiKey() + "&value=" + dialValue;
 
             URL url = new URL(apiUrl);
 
@@ -51,18 +55,17 @@ public class MCVUDialsControl {
 
             int responseCode = connection.getResponseCode();
             if (responseCode == HttpURLConnection.HTTP_OK || responseCode == HttpURLConnection.HTTP_CREATED) {
-                BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-                String inputLine;
-                StringBuffer response = new StringBuffer();
+                try (BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
+                    String inputLine;
+                    StringBuilder response = new StringBuilder();
 
-                while ((inputLine = in.readLine()) != null) {
-                    response.append(inputLine);
+                    while ((inputLine = in.readLine()) != null) {
+                        response.append(inputLine);
+                    }
+                    LOGGER.debug("Response: {}", response);
                 }
-                in.close();
-
-                LOGGER.debug("Response: " + response.toString());
             } else {
-                LOGGER.error("HTTP GET to API server didn't work: " + responseCode);
+                LOGGER.error("HTTP GET to API server didn't work: {}", responseCode);
             }
         } catch (IOException exception) {
             LOGGER.error("Error setting value on Dial!");
@@ -77,21 +80,22 @@ public class MCVUDialsControl {
 
     /**
      * Sets the color on the given dial.
-     * Since the dials can only increase or decrese the LED of either red green or blue,
+     * Since the dials can only increase or decrese the LED of either red green or
+     * blue,
      * the color has to be specified with a percantage value between 0-100
      * 
-     * @param   dialUid     The UID of the dial that will get the new value
-     * @param   red         The brightness of the red LED
-     * @param   green       The brightness of the green LED
-     * @param   blue        The brightness of the blue LED
+     * @param dialUid The UID of the dial that will get the new value
+     * @param red     The brightness of the red LED
+     * @param green   The brightness of the green LED
+     * @param blue    The brightness of the blue LED
      */
     public static void setDialColor(String dialUid, int red, int green, int blue) {
         HttpURLConnection connection = null;
 
         try {
 
-            String apiUrl = MCVUDialsConfig.vuServerApiBaseUrl + "/api/v0/dial/" + dialUid + "/backlight?key="
-                    + MCVUDialsConfig.vuServerApiKey + "&red=" + red + "&blue=" + blue + "&green=" + green;
+            String apiUrl = MCVUDialsConfig.getVuServerApiBaseUrl() + APIPATH + dialUid + "/backlight?key="
+                    + MCVUDialsConfig.getVuServerApiKey() + "&red=" + red + "&blue=" + blue + "&green=" + green;
 
             URL url = new URL(apiUrl);
 
@@ -100,18 +104,18 @@ public class MCVUDialsControl {
 
             int responseCode = connection.getResponseCode();
             if (responseCode == HttpURLConnection.HTTP_OK || responseCode == HttpURLConnection.HTTP_CREATED) {
-                BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-                String inputLine;
-                StringBuffer response = new StringBuffer();
+                try (BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
+                    String inputLine;
+                    StringBuilder response = new StringBuilder();
 
-                while ((inputLine = in.readLine()) != null) {
-                    response.append(inputLine);
+                    while ((inputLine = in.readLine()) != null) {
+                        response.append(inputLine);
+                    }
+
+                    LOGGER.debug("Response: {}", response);
                 }
-                in.close();
-
-                LOGGER.debug("Response: " + response.toString());
             } else {
-                LOGGER.error("HTTP GET to API server didn't work: " + responseCode);
+                LOGGER.error("HTTP GET to API server didn't work: {}", responseCode);
             }
         } catch (IOException exception) {
             LOGGER.error("Error setting color on Dial!");
@@ -126,17 +130,18 @@ public class MCVUDialsControl {
 
     /**
      * Sets the image on the given dial.
-     * The given image is pulled from within the jar file an therefore must be places inside the resources directory.
+     * The given image is pulled from within the jar file an therefore must be
+     * places inside the resources directory.
      * This method will then perform a multipart/form-data upload.
      * 
-     * @param   dialUid     The UID of the dial that will get the new value
-     * @param   dialImage   The new image that will be set on the dial
+     * @param dialUid   The UID of the dial that will get the new value
+     * @param dialImage The new image that will be set on the dial
      */
     public static void setDialImage(String dialUid, String dialImage) {
         try {
 
-            String apiUrl = MCVUDialsConfig.vuServerApiBaseUrl + "/api/v0/dial/" + dialUid + "/image/set?key="
-                    + MCVUDialsConfig.vuServerApiKey + "&imgfile=" + dialImage;
+            String apiUrl = MCVUDialsConfig.getVuServerApiBaseUrl() + APIPATH + dialUid + "/image/set?key="
+                    + MCVUDialsConfig.getVuServerApiKey() + "&imgfile=" + dialImage;
 
             String boundary = "===" + System.currentTimeMillis() + "===";
 
@@ -150,7 +155,8 @@ public class MCVUDialsControl {
             InputStream fileStream = MCVUDials.class.getResourceAsStream("/" + dialImage);
 
             try (OutputStream outputStream = connection.getOutputStream();
-                    PrintWriter writer = new PrintWriter(new OutputStreamWriter(outputStream, "UTF-8"), true)) {
+                    PrintWriter writer = new PrintWriter(new OutputStreamWriter(outputStream, StandardCharsets.UTF_8),
+                            true)) {
                 writer.append("--").append(boundary).append("\r\n");
                 writer.append("Content-Disposition: form-data; name=\"imgfile\"; filename=\"").append(dialImage)
                         .append("\"\r\n");
