@@ -1,7 +1,9 @@
-name: "[90] Check Pull-Request"
+name: "[90] Ensure Build"
 
 on:
   pull_request:
+    branches: ["main"]
+  push:
     branches: ["main"]
 
 jobs:
